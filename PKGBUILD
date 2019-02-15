@@ -10,10 +10,10 @@ pkgname=('linux419' 'linux419-headers')
 _kernelname=-MANJARO
 _basekernel=4.19
 _basever=419
-_aufs=20181217
+_aufs=20190211
 _bfq=v9
 _bfqdate=20190204
-_sub=20
+_sub=22
 _commit=
 pkgver=${_basekernel}.${_sub}
 pkgrel=1
@@ -31,7 +31,7 @@ source=("https://www.kernel.org/pub/linux/kernel/v4.x/linux-${_basekernel}.tar.x
         "${pkgbase}.preset" # standard config files for mkinitcpio ramdisk
         '60-linux.hook'     # pacman hook for depmod
         '90-linux.hook'     # pacman hook for initramfs regeneration
-        "aufs4.19-${_aufs}.patch.bz2"
+        "aufs4.19.17+-${_aufs}.patch.bz2"
         'aufs4-base.patch'
         'aufs4-kbuild.patch'
         'aufs4-loopback.patch'
@@ -61,21 +61,21 @@ source=("https://www.kernel.org/pub/linux/kernel/v4.x/linux-${_basekernel}.tar.x
         '0012-bootsplash.patch'
         '0013-bootsplash.patch')
 sha256sums=('0c68f5655528aed4f99dae71a5b259edc93239fa899e2df79c055275c21749a1'
-            '0c959755f6c7d84b16a28d08c15f15a904031db8845b52d52d1eccddcfa49d07'
+            '29c380271e1d8a99f641baa84423811ddf0915a5fba7bfc49df0a9a62c81ca66'
             '5a5ec4acbde288745b1a0d1319df009e1d53b3c53faaaabe5f2502cfef96113b'
             'cf9f1917c4570d52b0b88c41c26da42fe65ffca3cb7c562413f2d85c4fb84853'
             'b44d81446d8b53d5637287c30ae3eb64cae0078c3fbc45fcf1081dd6699818b5'
             '43942683a7ff01b180dff7f3de2db4885d43ab3d4e7bd0e1918c3aaf2ee061f4'
             'ae2e95db94ef7176207c690224169594d49445e04249d2499e9d2fbc117a0b21'
             '90831589b7ab43d6fab11bfa3ad788db14ba77ea4dc03d10ee29ad07194691e1'
-            '1c4d51dad01b9f474d55f93b659c955049b8823b611732157a7fa0cc7394144e'
-            'e239321d84448dd7575b9c5fc58bd76bcb5f0fdb7188a0dcad6010b88e67921c'
-            '7e6286cf91aaa68785312a0f6483e3323d8bab4feaaa6f09f2b2b7fc8157e811'
-            '1ba71b2474e8e26642cea6949fed2e03c219f54bca472ea82be0abd52976cca7'
-            '179f00f707a0c809cd44fff01bd31991a5dfff5500e2b02321f22925126404f0'
-            '37c07a2dd5249ce9277a370cf60cbebb24dc1e92b845ce419de63453d5e0b685'
-            'a50226860ed658251eb74014daad773cb0a8700ed7c5b81548ee4f77e8d6d4de'
-            '7f861935faf7ebd2d528052a363f0356c9b5239e32a68b4ec23dcf95ee91e708'
+            '7e5db8cfc37ea6f27107909d07cb923bf23465aadf15e9f67a826638e988611a'
+            'bb7dab3f010db7e0f3e67edd8526b2735f19086413a36ab77ba5c4af02013c9d'
+            '59708da839c4ce99ed05c3f7747e6c6551cd5e84d0c2a75b856f419856f0ff3b'
+            '0c4c6d54f4486ade957ee517ea0122941bc25a4ab445fccdb57146244257e5b7'
+            '0e0224a4ac56f96b2931338d4595060ae74c164daffca500e428f56ededc045f'
+            '67be2ec0056efee6c8e6cd88f60a2027b50154b0df8b97c0b308064547ac91a3'
+            'cea84684259922a3b3c484ec609159513ff2f12b2aa34d2697c6fc1c03bda5ec'
+            '9c25c5942c4656845744b83facbab97fda3f18747c8f71c129b928a6bda8d89a'
             '0998de1fd20f531f4f147e42af78137ee44c549dcfc9b6027ca91b5c791af11e'
             '37b86ca3de148a34258e3176dbf41488d9dbd19e93adbd22a062b3c41332ce85'
             '94afbc6a9cb0709f6cd71879bae66454ec26d37c83f49f58e4de28d47678e66b'
@@ -131,10 +131,10 @@ prepare() {
   git apply -p1 < "${srcdir}/0013-bootsplash.patch"
 
   # add aufs4 support
-  patch -Np1 -i "${srcdir}/aufs4.19-${_aufs}.patch"
+  patch -Np1 -i "${srcdir}/aufs4.19.17+-${_aufs}.patch"
   patch -Np1 -i "${srcdir}/aufs4-base.patch"
   patch -Np1 -i "${srcdir}/aufs4-kbuild.patch"
-  # patch -Np1 -i "${srcdir}/aufs4-loopback.patch" # currently broken
+  patch -Np1 -i "${srcdir}/aufs4-loopback.patch"
   patch -Np1 -i "${srcdir}/aufs4-mmap.patch"
   patch -Np1 -i "${srcdir}/aufs4-standalone.patch"
   patch -Np1 -i "${srcdir}/tmpfs-idr.patch"
