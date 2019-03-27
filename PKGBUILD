@@ -13,7 +13,7 @@ _basever=419
 _aufs=20190211
 _bfq=v9
 _bfqdate=20190204
-_sub=30
+_sub=32
 _commit=
 pkgver=${_basekernel}.${_sub}
 pkgrel=1
@@ -61,7 +61,7 @@ source=("https://www.kernel.org/pub/linux/kernel/v4.x/linux-${_basekernel}.tar.x
         '0012-bootsplash.patch'
         '0013-bootsplash.patch')
 sha256sums=('0c68f5655528aed4f99dae71a5b259edc93239fa899e2df79c055275c21749a1'
-            '0924f32b6d26fbf7feb4d5165e4bba14bba81c4cdc51b5e241e1ef6799705bdf'
+            '85a7e12b38575199d2ed889b7cf108b7740f20f1fe4d967f1c338df1682b4259'
             '5a5ec4acbde288745b1a0d1319df009e1d53b3c53faaaabe5f2502cfef96113b'
             'cf9f1917c4570d52b0b88c41c26da42fe65ffca3cb7c562413f2d85c4fb84853'
             'b44d81446d8b53d5637287c30ae3eb64cae0078c3fbc45fcf1081dd6699818b5'
