@@ -13,8 +13,7 @@ _basever=419
 _aufs=20190211
 _bfq=v9
 _bfqdate=20190204
-_sub=30
-_commit=
+_sub=35
 pkgver=${_basekernel}.${_sub}
 pkgrel=1
 arch=('i686' 'x86_64')
@@ -46,6 +45,7 @@ source=("https://www.kernel.org/pub/linux/kernel/v4.x/linux-${_basekernel}.tar.x
         # MANJARO Patches
         '0001-i2c-hid-override-HID-descriptors-for-certain-devices.patch'
         '0002-i2c-hid-properly-terminate-i2c_hid_dmi_desc_override_table_array.patch'
+        'ELAN_touchpad_i2c_hid_pinctrl.patch'
         # Bootsplash
         '0001-bootsplash.patch'
         '0002-bootsplash.patch'
@@ -61,7 +61,7 @@ source=("https://www.kernel.org/pub/linux/kernel/v4.x/linux-${_basekernel}.tar.x
         '0012-bootsplash.patch'
         '0013-bootsplash.patch')
 sha256sums=('0c68f5655528aed4f99dae71a5b259edc93239fa899e2df79c055275c21749a1'
-            '0924f32b6d26fbf7feb4d5165e4bba14bba81c4cdc51b5e241e1ef6799705bdf'
+            '5124dcab41a075ffc2e9c9197e8caca04aeaaf4ad572d77a84308ac9aee8ba84'
             '5a5ec4acbde288745b1a0d1319df009e1d53b3c53faaaabe5f2502cfef96113b'
             'cf9f1917c4570d52b0b88c41c26da42fe65ffca3cb7c562413f2d85c4fb84853'
             'b44d81446d8b53d5637287c30ae3eb64cae0078c3fbc45fcf1081dd6699818b5'
@@ -80,6 +80,7 @@ sha256sums=('0c68f5655528aed4f99dae71a5b259edc93239fa899e2df79c055275c21749a1'
             '37b86ca3de148a34258e3176dbf41488d9dbd19e93adbd22a062b3c41332ce85'
             '94afbc6a9cb0709f6cd71879bae66454ec26d37c83f49f58e4de28d47678e66b'
             '8dc7285a797c77e917aab1c05847370b71725389b9718c58b4565b40eed80d85'
+            'd5204941a683ce09f97fd068863e0fe437a15c6e1b87e08bd9a992d65e8b0d38'
             'a504f6cf84094e08eaa3cc5b28440261797bf4f06f04993ee46a20628ff2b53c'
             'e096b127a5208f56d368d2cb938933454d7200d70c86b763aa22c38e0ddb8717'
             '8c1c880f2caa9c7ae43281a35410203887ea8eae750fe8d360d0c8bf80fcc6e0'
@@ -113,6 +114,8 @@ prepare() {
   # https://forum.manjaro.org/t/36269/78
   patch -Np1 -i ../0001-i2c-hid-override-HID-descriptors-for-certain-devices.patch
   patch -Np1 -i ../0002-i2c-hid-properly-terminate-i2c_hid_dmi_desc_override_table_array.patch
+
+  patch -Np1 -i ../ELAN_touchpad_i2c_hid_pinctrl.patch
 
   # Add bootsplash - http://lkml.iu.edu/hypermail/linux/kernel/1710.3/01542.html
   patch -Np1 -i "${srcdir}/0001-bootsplash.patch"
