@@ -13,7 +13,7 @@ _basever=419
 _aufs=20190211
 _bfq=v9
 _bfqdate=20190204
-_sub=35
+_sub=36
 pkgver=${_basekernel}.${_sub}
 pkgrel=1
 arch=('i686' 'x86_64')
@@ -23,8 +23,6 @@ makedepends=('xmlto' 'docbook-xsl' 'kmod' 'inetutils' 'bc' 'elfutils' 'git')
 options=('!strip')
 source=("https://www.kernel.org/pub/linux/kernel/v4.x/linux-${_basekernel}.tar.xz"
         "https://www.kernel.org/pub/linux/kernel/v4.x/patch-${pkgver}.xz"
-        #https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable-rc.git/snapshot/linux-stable-rc-$_commit.tar.gz
-        #"linux-${pkgver}.tar.gz::https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/snapshot/linux-$_commit.tar.gz"
         # the main kernel config files
         'config.x86_64' 'config' 'config.aufs'
         "${pkgbase}.preset" # standard config files for mkinitcpio ramdisk
@@ -39,11 +37,11 @@ source=("https://www.kernel.org/pub/linux/kernel/v4.x/linux-${_basekernel}.tar.x
         'tmpfs-idr.patch'
         'vfs-ino.patch'
         #"0001-BFQ-${_bfq}-${_bfqdate}.patch::https://github.com/Algodev-github/bfq-mq/compare/0adb328...698937e.patch"
-        0001-BFQ-${_bfq}-${_bfqdate}.patch::https://raw.githubusercontent.com/sirlucjan/kernel-patches/master/4.19/bfq-sq-mq/4.19-bfq-sq-mq-v9r1-2K190204-rc1.patch
+        "0001-BFQ-${_bfq}-${_bfqdate}.patch::https://raw.githubusercontent.com/sirlucjan/kernel-patches/master/4.19/bfq-sq-mq/4.19-bfq-sq-mq-v9r1-2K190204-rc1.patch"
         # ARCH Patches
         '0001-add-sysctl-to-disallow-unprivileged-CLONE_NEWUSER-by.patch'
         # MANJARO Patches
-        '0001-i2c-hid-override-HID-descriptors-for-certain-devices.patch'
+#        '0001-i2c-hid-override-HID-descriptors-for-certain-devices.patch'
         '0002-i2c-hid-properly-terminate-i2c_hid_dmi_desc_override_table_array.patch'
         'ELAN_touchpad_i2c_hid_pinctrl.patch'
         # Bootsplash
@@ -61,9 +59,9 @@ source=("https://www.kernel.org/pub/linux/kernel/v4.x/linux-${_basekernel}.tar.x
         '0012-bootsplash.patch'
         '0013-bootsplash.patch')
 sha256sums=('0c68f5655528aed4f99dae71a5b259edc93239fa899e2df79c055275c21749a1'
-            '5124dcab41a075ffc2e9c9197e8caca04aeaaf4ad572d77a84308ac9aee8ba84'
-            '5a5ec4acbde288745b1a0d1319df009e1d53b3c53faaaabe5f2502cfef96113b'
-            'cf9f1917c4570d52b0b88c41c26da42fe65ffca3cb7c562413f2d85c4fb84853'
+            '0703078d84261d098492abaab813a0bab2b408f923d96e66c980f2cdb8d326a8'
+            '49c81c87c13b388019232a562e9a769e8621bd47a0f355e87d0021bc3ffc0490'
+            '266670dba3b7deee93c50733c4657fe33bc273d4c4c091409644611194fee472'
             'b44d81446d8b53d5637287c30ae3eb64cae0078c3fbc45fcf1081dd6699818b5'
             '43942683a7ff01b180dff7f3de2db4885d43ab3d4e7bd0e1918c3aaf2ee061f4'
             'ae2e95db94ef7176207c690224169594d49445e04249d2499e9d2fbc117a0b21'
@@ -78,7 +76,6 @@ sha256sums=('0c68f5655528aed4f99dae71a5b259edc93239fa899e2df79c055275c21749a1'
             '9c25c5942c4656845744b83facbab97fda3f18747c8f71c129b928a6bda8d89a'
             '0998de1fd20f531f4f147e42af78137ee44c549dcfc9b6027ca91b5c791af11e'
             '37b86ca3de148a34258e3176dbf41488d9dbd19e93adbd22a062b3c41332ce85'
-            '94afbc6a9cb0709f6cd71879bae66454ec26d37c83f49f58e4de28d47678e66b'
             '8dc7285a797c77e917aab1c05847370b71725389b9718c58b4565b40eed80d85'
             'd5204941a683ce09f97fd068863e0fe437a15c6e1b87e08bd9a992d65e8b0d38'
             'a504f6cf84094e08eaa3cc5b28440261797bf4f06f04993ee46a20628ff2b53c'
@@ -108,14 +105,14 @@ prepare() {
   #patch -Np1 -i "${srcdir}/prepatch-${_basekernel}`date +%Y%m%d`"
 
   # disable USER_NS for non-root users by default
-  patch -Np1 -i ../0001-add-sysctl-to-disallow-unprivileged-CLONE_NEWUSER-by.patch
+  patch -Np1 -i '../0001-add-sysctl-to-disallow-unprivileged-CLONE_NEWUSER-by.patch'
 
   # https://bugzilla.redhat.com/show_bug.cgi?id=1526312
   # https://forum.manjaro.org/t/36269/78
-  patch -Np1 -i ../0001-i2c-hid-override-HID-descriptors-for-certain-devices.patch
-  patch -Np1 -i ../0002-i2c-hid-properly-terminate-i2c_hid_dmi_desc_override_table_array.patch
+#  patch -Np1 -i '../0001-i2c-hid-override-HID-descriptors-for-certain-devices.patch'
+  patch -Np1 -i '../0002-i2c-hid-properly-terminate-i2c_hid_dmi_desc_override_table_array.patch'
 
-  patch -Np1 -i ../ELAN_touchpad_i2c_hid_pinctrl.patch
+  patch -Np1 -i '../ELAN_touchpad_i2c_hid_pinctrl.patch'
 
   # Add bootsplash - http://lkml.iu.edu/hypermail/linux/kernel/1710.3/01542.html
   patch -Np1 -i "${srcdir}/0001-bootsplash.patch"
