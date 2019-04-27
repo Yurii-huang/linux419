@@ -13,7 +13,7 @@ _basever=419
 _aufs=20190211
 _bfq=v9
 _bfqdate=20190204
-_sub=36
+_sub=37
 pkgver=${_basekernel}.${_sub}
 pkgrel=1
 arch=('i686' 'x86_64')
@@ -42,7 +42,7 @@ source=("https://www.kernel.org/pub/linux/kernel/v4.x/linux-${_basekernel}.tar.x
         '0001-add-sysctl-to-disallow-unprivileged-CLONE_NEWUSER-by.patch'
         # MANJARO Patches
 #        '0001-i2c-hid-override-HID-descriptors-for-certain-devices.patch'
-        '0002-i2c-hid-properly-terminate-i2c_hid_dmi_desc_override_table_array.patch'
+#        '0002-i2c-hid-properly-terminate-i2c_hid_dmi_desc_override_table_array.patch'
         'ELAN_touchpad_i2c_hid_pinctrl.patch'
         # Bootsplash
         '0001-bootsplash.patch'
@@ -59,7 +59,7 @@ source=("https://www.kernel.org/pub/linux/kernel/v4.x/linux-${_basekernel}.tar.x
         '0012-bootsplash.patch'
         '0013-bootsplash.patch')
 sha256sums=('0c68f5655528aed4f99dae71a5b259edc93239fa899e2df79c055275c21749a1'
-            '0703078d84261d098492abaab813a0bab2b408f923d96e66c980f2cdb8d326a8'
+            '517d79fc64b4c95ee5845ce21e4c60efb8f9479ce7c4ca2ac3496cf670e906ff'
             '49c81c87c13b388019232a562e9a769e8621bd47a0f355e87d0021bc3ffc0490'
             '266670dba3b7deee93c50733c4657fe33bc273d4c4c091409644611194fee472'
             'b44d81446d8b53d5637287c30ae3eb64cae0078c3fbc45fcf1081dd6699818b5'
@@ -76,7 +76,6 @@ sha256sums=('0c68f5655528aed4f99dae71a5b259edc93239fa899e2df79c055275c21749a1'
             '9c25c5942c4656845744b83facbab97fda3f18747c8f71c129b928a6bda8d89a'
             '0998de1fd20f531f4f147e42af78137ee44c549dcfc9b6027ca91b5c791af11e'
             '37b86ca3de148a34258e3176dbf41488d9dbd19e93adbd22a062b3c41332ce85'
-            '8dc7285a797c77e917aab1c05847370b71725389b9718c58b4565b40eed80d85'
             'd5204941a683ce09f97fd068863e0fe437a15c6e1b87e08bd9a992d65e8b0d38'
             'a504f6cf84094e08eaa3cc5b28440261797bf4f06f04993ee46a20628ff2b53c'
             'e096b127a5208f56d368d2cb938933454d7200d70c86b763aa22c38e0ddb8717'
@@ -110,7 +109,7 @@ prepare() {
   # https://bugzilla.redhat.com/show_bug.cgi?id=1526312
   # https://forum.manjaro.org/t/36269/78
 #  patch -Np1 -i '../0001-i2c-hid-override-HID-descriptors-for-certain-devices.patch'
-  patch -Np1 -i '../0002-i2c-hid-properly-terminate-i2c_hid_dmi_desc_override_table_array.patch'
+#  patch -Np1 -i '../0002-i2c-hid-properly-terminate-i2c_hid_dmi_desc_override_table_array.patch'
 
   patch -Np1 -i '../ELAN_touchpad_i2c_hid_pinctrl.patch'
 
