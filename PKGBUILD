@@ -13,7 +13,7 @@ _basever=419
 _aufs=20190211
 _bfq=v9
 _bfqdate=20190204
-_sub=37
+_sub=38
 pkgver=${_basekernel}.${_sub}
 pkgrel=1
 arch=('i686' 'x86_64')
@@ -59,9 +59,9 @@ source=("https://www.kernel.org/pub/linux/kernel/v4.x/linux-${_basekernel}.tar.x
         '0012-bootsplash.patch'
         '0013-bootsplash.patch')
 sha256sums=('0c68f5655528aed4f99dae71a5b259edc93239fa899e2df79c055275c21749a1'
-            '517d79fc64b4c95ee5845ce21e4c60efb8f9479ce7c4ca2ac3496cf670e906ff'
-            '49c81c87c13b388019232a562e9a769e8621bd47a0f355e87d0021bc3ffc0490'
-            '266670dba3b7deee93c50733c4657fe33bc273d4c4c091409644611194fee472'
+            'facb825a73adc3b0921edbeea3243c7f7b5d868e7330d0c081cb624f1d22d4e0'
+            '8c463fd0b920a1aac691ae74c5b34aa1af0bdf2f769615aae1c96285a5dc6c9b'
+            'c0e4a9118aa94039d6d57256fa3f91796f216a8b9abd3b7e09c3b52066d3884e'
             'b44d81446d8b53d5637287c30ae3eb64cae0078c3fbc45fcf1081dd6699818b5'
             '43942683a7ff01b180dff7f3de2db4885d43ab3d4e7bd0e1918c3aaf2ee061f4'
             'ae2e95db94ef7176207c690224169594d49445e04249d2499e9d2fbc117a0b21'
