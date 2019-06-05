@@ -10,7 +10,7 @@ pkgname=('linux419' 'linux419-headers')
 _kernelname=-MANJARO
 _basekernel=4.19
 _basever=419
-_aufs=20190311
+_aufs=20190603
 _bfq=v10
 _bfqdate=20190411
 _sub=48
@@ -28,7 +28,7 @@ source=("https://www.kernel.org/pub/linux/kernel/v4.x/linux-${_basekernel}.tar.x
         "${pkgbase}.preset" # standard config files for mkinitcpio ramdisk
         '60-linux.hook'     # pacman hook for depmod
         '90-linux.hook'     # pacman hook for initramfs regeneration
-        "aufs4.19.17+-${_aufs}.patch.bz2"
+        "aufs4.19.17+-${_aufs}.patch"
         'aufs4-base.patch'
         'aufs4-kbuild.patch'
         'aufs4-loopback.patch'
@@ -67,12 +67,12 @@ sha256sums=('0c68f5655528aed4f99dae71a5b259edc93239fa899e2df79c055275c21749a1'
             '43942683a7ff01b180dff7f3de2db4885d43ab3d4e7bd0e1918c3aaf2ee061f4'
             'ae2e95db94ef7176207c690224169594d49445e04249d2499e9d2fbc117a0b21'
             '90831589b7ab43d6fab11bfa3ad788db14ba77ea4dc03d10ee29ad07194691e1'
-            '2dc5770bf895985c424a37f7ffa812e1beacddfe1184193977b32e5e09688a0d'
+            '3a1ade985957f7fdb0d4b456f236898cc1917a618ee5f429e4a8e1dca56d1bf2'
             'a37bdc6cbbf2f69977c2725fa651e6ee137205acea81d5c00d5ce9bf4bec004b'
             '59708da839c4ce99ed05c3f7747e6c6551cd5e84d0c2a75b856f419856f0ff3b'
-            '8f4fe7c7dd33aeb3eb38f6a02e824361ec27bbe0743f30945bea4a57b5fda09f'
+            '59ed835a4caff7f752eb9bd8c3b1923a8fef706416dac7142bec2d0b45a15711'
             'b7d6e24fda7c9c2a8a5d6f2f670f56a3f0a7bb1afe97ca174eed6d277caeffd3'
-            '67be2ec0056efee6c8e6cd88f60a2027b50154b0df8b97c0b308064547ac91a3'
+            '76ed3a42354d85c2428e95fb32ee628f09fd815e062342df4b902fd7aa8be4bc'
             'cea84684259922a3b3c484ec609159513ff2f12b2aa34d2697c6fc1c03bda5ec'
             '9c25c5942c4656845744b83facbab97fda3f18747c8f71c129b928a6bda8d89a'
             'b743c44d0dacca2a4ee8dea73b49af6df16dda10d3edb9dadd1f669619e33233'

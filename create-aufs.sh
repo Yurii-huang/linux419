@@ -23,11 +23,11 @@ cp -a Documentation ../tmp/linux-4.19.17+
 rm ../tmp/linux-4.19.17+/include/uapi/linux/Kbuild
 cd ../tmp
 diff -Naur null linux-4.19.17+  | filterdiff | \
-sed -e 's|null\(/include/uapi/linux/Kbuild\)|linux-4.19.17+-old\1|;s|^--- null.*|--- /dev/null|;\|linux-4.19.17+/include/uapi/linux/Kbuild|,${\|@@ -0,0 +1 @@|,$d}' | \
-bzip2 > aufs$(sed -ne 's|#define.*AUFS_VERSION.*"\(.*\)"|\1|p'  linux-4.19.17+/include/uapi/linux/aufs_type.h).patch.bz2
-mv *.bz2 $OLDPWD
+sed -e 's|null\(/include/uapi/linux/Kbuild\)|linux-4.19.17+-old\1|;s|^--- null.*|--- /dev/null|;\|linux-4.19.17+/include/uapi/linux/Kbuild|,${\|@@ -0,0 +1 @@|,$d}' \
+> aufs$(sed -ne 's|#define.*AUFS_VERSION.*"\(.*\)"|\1|p'  linux-4.19.17+/include/uapi/linux/aufs_type.h).patch
+mv *.patch $OLDPWD
 cd $OLDPWD
-mv *patch* ..
+mv *.patch ..
 cd ..
 rm -rf tmp aufs4-standalone
 
