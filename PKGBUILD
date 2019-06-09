@@ -13,7 +13,7 @@ _basever=419
 _aufs=20190603
 _bfq=v10
 _bfqdate=20190411
-_sub=48
+_sub=49
 pkgver=${_basekernel}.${_sub}
 pkgrel=1
 arch=('i686' 'x86_64')
@@ -60,7 +60,7 @@ source=("https://www.kernel.org/pub/linux/kernel/v4.x/linux-${_basekernel}.tar.x
         '0012-bootsplash.patch'
         '0013-bootsplash.patch')
 sha256sums=('0c68f5655528aed4f99dae71a5b259edc93239fa899e2df79c055275c21749a1'
-            '78310c2f3f6ad19a87fe32e872c695451186733e5ddd1946f67ca742e88b570a'
+            '6db8a2cf4dd3808e4bcf47da5b434de78e2eadb367432db1c4709ac83910117a'
             '8c463fd0b920a1aac691ae74c5b34aa1af0bdf2f769615aae1c96285a5dc6c9b'
             'fcbd8852371a6804b81a09681cb7c8083383a3ab58a288661aaa3919a4123544'
             'b44d81446d8b53d5637287c30ae3eb64cae0078c3fbc45fcf1081dd6699818b5'
