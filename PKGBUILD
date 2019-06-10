@@ -14,7 +14,9 @@ _aufs=20190603
 _bfq=v10
 _bfqdate=20190411
 _sub=49
-pkgver=${_basekernel}.${_sub}
+_rc=50-rc1
+#pkgver=${_basekernel}.${_sub}
+pkgver=${_basekernel}.50
 pkgrel=1
 arch=('i686' 'x86_64')
 url="http://www.kernel.org/"
@@ -22,7 +24,9 @@ license=('GPL2')
 makedepends=('xmlto' 'docbook-xsl' 'kmod' 'inetutils' 'bc' 'elfutils' 'git')
 options=('!strip')
 source=("https://www.kernel.org/pub/linux/kernel/v4.x/linux-${_basekernel}.tar.xz"
-        "https://www.kernel.org/pub/linux/kernel/v4.x/patch-${pkgver}.xz"
+        #"http://www.kernel.org/pub/linux/kernel/v4.x/patch-${pkgver}.xz"
+        "http://www.kernel.org/pub/linux/kernel/v4.x/patch-${_basekernel}.${_sub}.xz"
+        "http://www.kernel.org/pub/linux/kernel/v4.x/stable-review/patch-${_basekernel}.${_rc}.xz"
         # the main kernel config files
         'config.x86_64' 'config' 'config.aufs'
         "${pkgbase}.preset" # standard config files for mkinitcpio ramdisk
@@ -61,7 +65,8 @@ source=("https://www.kernel.org/pub/linux/kernel/v4.x/linux-${_basekernel}.tar.x
         '0013-bootsplash.patch')
 sha256sums=('0c68f5655528aed4f99dae71a5b259edc93239fa899e2df79c055275c21749a1'
             '6db8a2cf4dd3808e4bcf47da5b434de78e2eadb367432db1c4709ac83910117a'
-            '8c463fd0b920a1aac691ae74c5b34aa1af0bdf2f769615aae1c96285a5dc6c9b'
+            '256ae2560a8acb28ddd67a94e551d6106b77343722bddfccb0e5f5ff9920d444'
+            '7f0c1625f9c973fe42e89a4c3732563dfff31de97f5335ba8f9c4bbb29f858df'
             'fcbd8852371a6804b81a09681cb7c8083383a3ab58a288661aaa3919a4123544'
             'b44d81446d8b53d5637287c30ae3eb64cae0078c3fbc45fcf1081dd6699818b5'
             '43942683a7ff01b180dff7f3de2db4885d43ab3d4e7bd0e1918c3aaf2ee061f4'
@@ -97,7 +102,9 @@ prepare() {
   cd "${srcdir}/linux-${_basekernel}"
 
   # add upstream patch
-  patch -p1 -i "${srcdir}/patch-${pkgver}"
+  #patch -p1 -i "${srcdir}/patch-${pkgver}"
+  patch -p1 -i "${srcdir}/patch-${_basekernel}.${_sub}"
+  patch -p1 -i "${srcdir}/patch-${_basekernel}.${_rc}"
 
   # add latest fixes from stable queue, if needed
   # http://git.kernel.org/?p=linux/kernel/git/stable/stable-queue.git
@@ -142,6 +149,8 @@ prepare() {
 
   # add BFQ scheduler
 #  patch -Np1 -i "${srcdir}/0001-BFQ-${_bfq}-${_bfqdate}.patch"
+  sed -i -e "s|SUBLEVEL = 0|SUBLEVEL = $(echo ${_rc} | cut -d "-" -f1)|g" "${srcdir}/0001-BFQ-${_bfq}-${_bfqdate}-mjr.patch"
+  sed -i -e "s|EXTRAVERSION =|EXTRAVERSION = -$(echo ${_rc} | cut -d "-" -f2)|1" "${srcdir}/0001-BFQ-${_bfq}-${_bfqdate}-mjr.patch"
   patch -Np1 -i "${srcdir}/0001-BFQ-${_bfq}-${_bfqdate}-mjr.patch"
 
   if [ "${CARCH}" = "x86_64" ]; then
