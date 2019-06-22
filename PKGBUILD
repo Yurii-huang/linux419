@@ -13,7 +13,7 @@ _basever=419
 _aufs=20190610
 _bfq=v10
 _bfqdate=20190411
-_sub=52
+_sub=53
 _rc=
 #pkgver=${_basekernel}.50
 pkgver=${_basekernel}.${_sub}
@@ -46,8 +46,7 @@ source=("https://www.kernel.org/pub/linux/kernel/v4.x/linux-${_basekernel}.tar.x
         # ARCH Patches
         '0001-add-sysctl-to-disallow-unprivileged-CLONE_NEWUSER-by.patch'
         # MANJARO Patches
-#        '0001-i2c-hid-override-HID-descriptors-for-certain-devices.patch'
-#        '0002-i2c-hid-properly-terminate-i2c_hid_dmi_desc_override_table_array.patch'
+        '0001-tcp-refine memory-limit-test-in-tcp_fragment.patch::https://github.com/torvalds/linux/commit/b6653b3629e5b88202be3c9abc44713973f5c4b4.patch'
         'ELAN_touchpad_i2c_hid_pinctrl.patch'
         # Bootsplash
         '0001-bootsplash.patch'
@@ -64,7 +63,7 @@ source=("https://www.kernel.org/pub/linux/kernel/v4.x/linux-${_basekernel}.tar.x
         '0012-bootsplash.patch'
         '0013-bootsplash.patch')
 sha256sums=('0c68f5655528aed4f99dae71a5b259edc93239fa899e2df79c055275c21749a1'
-            '3595944127d4c9fccbb23e609c9218d3139396ea97e7e6bf5b2a4686074c655c'
+            'b53b5da09d4b1aebe0095c15367d4a39760fce61e61d7cd86f638b22a243d5db'
             '7f0c1625f9c973fe42e89a4c3732563dfff31de97f5335ba8f9c4bbb29f858df'
             'fcbd8852371a6804b81a09681cb7c8083383a3ab58a288661aaa3919a4123544'
             'b44d81446d8b53d5637287c30ae3eb64cae0078c3fbc45fcf1081dd6699818b5'
@@ -115,10 +114,10 @@ prepare() {
 
   # https://bugzilla.redhat.com/show_bug.cgi?id=1526312
   # https://forum.manjaro.org/t/36269/78
-#  patch -Np1 -i '../0001-i2c-hid-override-HID-descriptors-for-certain-devices.patch'
-#  patch -Np1 -i '../0002-i2c-hid-properly-terminate-i2c_hid_dmi_desc_override_table_array.patch'
-
   patch -Np1 -i '../ELAN_touchpad_i2c_hid_pinctrl.patch'
+
+  # https://github.com/ValveSoftware/steam-for-linux/issues/6326
+  patch -Np1 -i ../0001-tcp-refine memory-limit-test-in-tcp_fragment.patch
 
   # Add bootsplash - http://lkml.iu.edu/hypermail/linux/kernel/1710.3/01542.html
   patch -Np1 -i "${srcdir}/0001-bootsplash.patch"
