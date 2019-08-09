@@ -13,8 +13,7 @@ _basever=419
 _aufs=20190610
 _bfq=v10
 _bfqdate=20190411
-_sub=65
-pkgver=${_basekernel}.${_sub}
+pkgver=4.19.66
 pkgrel=1
 arch=('i686' 'x86_64')
 url="http://www.kernel.org/"
@@ -23,8 +22,6 @@ makedepends=('xmlto' 'docbook-xsl' 'kmod' 'inetutils' 'bc' 'elfutils' 'git')
 options=('!strip')
 source=("https://www.kernel.org/pub/linux/kernel/v4.x/linux-${_basekernel}.tar.xz"
         "http://www.kernel.org/pub/linux/kernel/v4.x/patch-${pkgver}.xz"
-        #"http://www.kernel.org/pub/linux/kernel/v4.x/patch-${_basekernel}.${_sub}.xz"
-        #"http://www.kernel.org/pub/linux/kernel/v4.x/stable-review/patch-${_basekernel}.${_rc}.xz"
         # the main kernel config files
         'config.x86_64' 'config' 'config.aufs'
         "${pkgbase}.preset" # standard config files for mkinitcpio ramdisk
@@ -60,7 +57,7 @@ source=("https://www.kernel.org/pub/linux/kernel/v4.x/linux-${_basekernel}.tar.x
         '0012-bootsplash.patch'
         '0013-bootsplash.patch')
 sha256sums=('0c68f5655528aed4f99dae71a5b259edc93239fa899e2df79c055275c21749a1'
-            '58e7b2ec853a02297a10cf850c252c7b414c0e55207d37702645564eabfbe955'
+            '72124b6198d3a0b524057ac92a86b107b9b4f0b81fe357ebd3167b83bd6d8f2c'
             '62977a8c9c11100d4fd5fd7540cd1d26660132e7344cf7c18975998d912af85e'
             'fcbd8852371a6804b81a09681cb7c8083383a3ab58a288661aaa3919a4123544'
             'b44d81446d8b53d5637287c30ae3eb64cae0078c3fbc45fcf1081dd6699818b5'
@@ -98,8 +95,6 @@ prepare() {
 
   # add upstream patch
   patch -p1 -i "${srcdir}/patch-${pkgver}"
-  #patch -p1 -i "${srcdir}/patch-${_basekernel}.${_sub}"
-  #patch -p1 -i "${srcdir}/patch-${_basekernel}.${_rc}"
 
   # add latest fixes from stable queue, if needed
   # http://git.kernel.org/?p=linux/kernel/git/stable/stable-queue.git
@@ -140,10 +135,7 @@ prepare() {
   patch -Np1 -i "${srcdir}/vfs-ino.patch"
 
   # add BFQ scheduler
-#  patch -Np1 -i "${srcdir}/0001-BFQ-${_bfq}-${_bfqdate}.patch"
-  #sed -i -e "s|SUBLEVEL = 0|SUBLEVEL = $(echo ${_rc} | cut -d "-" -f1)|g" "${srcdir}/0001-BFQ-${_bfq}-${_bfqdate}-mjr.patch"
-  #sed -i -e "s|EXTRAVERSION =|EXTRAVERSION = -$(echo ${_rc} | cut -d "-" -f2)|1" "${srcdir}/0001-BFQ-${_bfq}-${_bfqdate}-mjr.patch"
-  sed -i -e "s|SUBLEVEL = 0|SUBLEVEL = ${_sub}|g" "${srcdir}/0001-BFQ-${_bfq}-${_bfqdate}-mjr.patch"
+  sed -i -e "s/SUBLEVEL = 0/SUBLEVEL = $(echo ${pkgver} | cut -d. -f2)/g" "${srcdir}/0001-BFQ-${_bfq}-${_bfqdate}-mjr.patch"
   patch -Np1 -i "${srcdir}/0001-BFQ-${_bfq}-${_bfqdate}-mjr.patch"
 
   if [ "${CARCH}" = "x86_64" ]; then
