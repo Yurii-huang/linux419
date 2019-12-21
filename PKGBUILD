@@ -13,7 +13,7 @@ _basever=419
 _aufs=20190902
 _bfq=v10
 _bfqdate=20190411
-pkgver=4.19.90
+pkgver=4.19.91
 pkgrel=1
 arch=('i686' 'x86_64')
 url="http://www.kernel.org/"
@@ -56,7 +56,7 @@ source=("https://www.kernel.org/pub/linux/kernel/v4.x/linux-${_basekernel}.tar.x
         '0012-bootsplash.patch'
         '0013-bootsplash.patch')
 sha256sums=('0c68f5655528aed4f99dae71a5b259edc93239fa899e2df79c055275c21749a1'
-            '4acc33cb47c4e69a23c61eb4960fbd1e3bb5607b5c8ef6a08998dd86f622241a'
+            '638dd35177e7eb3a38fca6df2f902d5d9d98e0c974121d3901d81c2104a8acf4'
             'b3372c8c3f6d11beeb8c54ab1484f37e2ec9dea726501fbd3b18164b48823a60'
             'fcbd8852371a6804b81a09681cb7c8083383a3ab58a288661aaa3919a4123544'
             'b44d81446d8b53d5637287c30ae3eb64cae0078c3fbc45fcf1081dd6699818b5'
@@ -182,7 +182,6 @@ package_linux419() {
   depends=('coreutils' 'linux-firmware' 'kmod' 'mkinitcpio>=27')
   optdepends=('crda: to set the correct wireless channels of your country')
   provides=("linux=${pkgver}")
-  backup=("etc/mkinitcpio.d/${pkgbase}.preset")
 
   cd "${srcdir}/linux-${_basekernel}"
 
