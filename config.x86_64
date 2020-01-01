@@ -1,6 +1,6 @@
 #
 # Automatically generated file; DO NOT EDIT.
-# Linux/x86 4.19.89-1 Kernel Configuration
+# Linux/x86 4.19.92-1 Kernel Configuration
 #
 
 #
@@ -8126,7 +8126,7 @@ CONFIG_RPMSG_CHAR=m
 CONFIG_RPMSG_QCOM_GLINK_NATIVE=m
 CONFIG_RPMSG_QCOM_GLINK_RPM=m
 CONFIG_RPMSG_VIRTIO=m
-CONFIG_SOUNDWIRE=y
+CONFIG_SOUNDWIRE=m
 
 #
 # SoundWire Devices
