@@ -13,7 +13,7 @@ _basever=419
 _aufs=20190902
 _bfq=v10
 _bfqdate=20190411
-pkgver=4.19.93
+pkgver=4.19.95
 pkgrel=1
 arch=('i686' 'x86_64')
 url="http://www.kernel.org/"
@@ -40,7 +40,8 @@ source=("https://www.kernel.org/pub/linux/kernel/v4.x/linux-${_basekernel}.tar.x
         '0001-add-sysctl-to-disallow-unprivileged-CLONE_NEWUSER-by.patch'
         '0002-ZEN-Add-CONFIG-for-unprivileged_userns_clone.patch'
         # MANJARO Patches
-        'ELAN_touchpad_i2c_hid_pinctrl.patch'
+        '0001-ELAN_touchpad_i2c_hid_pinctrl.patch'
+        '0001-i2c-nuvoton-nc677x-hwmon-driver.patch'
         # Bootsplash
         '0001-bootsplash.patch'
         '0002-bootsplash.patch'
@@ -56,8 +57,8 @@ source=("https://www.kernel.org/pub/linux/kernel/v4.x/linux-${_basekernel}.tar.x
         '0012-bootsplash.patch'
         '0013-bootsplash.patch')
 sha256sums=('0c68f5655528aed4f99dae71a5b259edc93239fa899e2df79c055275c21749a1'
-            'c25fd4b8c81a9920eb547464a5e2b99406036c5c7408c00a9c3955fa73a1a40a'
-            '71c9932cb6bf8c75aef723f31ca6ac7638e1e200d90a9f32d85f2d3c4b9c529e'
+            '9501e5afcadfc7dd7c30531b4c24b94f02a741fe41b991849c2dd0953ad7d52f'
+            'e9fd4ba49de9cc43c27edc751d2b12381aae078aac8567d377db9430fe21ff55'
             'fcbd8852371a6804b81a09681cb7c8083383a3ab58a288661aaa3919a4123544'
             'b44d81446d8b53d5637287c30ae3eb64cae0078c3fbc45fcf1081dd6699818b5'
             'da3769061d2eefe3958f06a77dc73ee82cabf636f69e1f55ff2c02b7d1126f8c'
@@ -72,6 +73,7 @@ sha256sums=('0c68f5655528aed4f99dae71a5b259edc93239fa899e2df79c055275c21749a1'
             'bc3dab5594735fb56bdb39c1630a470fd2e65fcf0d81a5db31bab3b91944225d'
             '67aed9742e4281df6f0bd18dc936ae79319fee3763737f158c0e87a6948d100d'
             'd5204941a683ce09f97fd068863e0fe437a15c6e1b87e08bd9a992d65e8b0d38'
+            '0556859a8168c8f7da9af8e2059d33216d9e5378d2cac70ca54c5ff843fa5add'
             'a504f6cf84094e08eaa3cc5b28440261797bf4f06f04993ee46a20628ff2b53c'
             'e096b127a5208f56d368d2cb938933454d7200d70c86b763aa22c38e0ddb8717'
             '8c1c880f2caa9c7ae43281a35410203887ea8eae750fe8d360d0c8bf80fcc6e0'
@@ -104,7 +106,10 @@ prepare() {
 
   # https://bugzilla.redhat.com/show_bug.cgi?id=1526312
   # https://forum.manjaro.org/t/36269/78
-  patch -Np1 -i '../ELAN_touchpad_i2c_hid_pinctrl.patch'
+  patch -Np1 -i '../0001-ELAN_touchpad_i2c_hid_pinctrl.patch'
+
+  # https://twitter.com/vskye11/status/1216240051639791616
+  patch -Np1 -i '../0001-i2c-nuvoton-nc677x-hwmon-driver.patch'
 
   # Add bootsplash - http://lkml.iu.edu/hypermail/linux/kernel/1710.3/01542.html
   patch -Np1 -i "${srcdir}/0001-bootsplash.patch"
