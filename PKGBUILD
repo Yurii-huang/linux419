@@ -14,7 +14,7 @@ _aufs=20190902
 _bfq=v10
 _bfqdate=20190411
 pkgver=4.19.109
-pkgrel=2
+pkgrel=3
 arch=('i686' 'x86_64')
 url="http://www.kernel.org/"
 license=('GPL2')
@@ -41,7 +41,8 @@ source=("https://www.kernel.org/pub/linux/kernel/v4.x/linux-${_basekernel}.tar.x
         '0002-ZEN-Add-CONFIG-for-unprivileged_userns_clone.patch'
         # MANJARO Patches
         '0001-ELAN_touchpad_i2c_hid_pinctrl.patch'
-        '0001-i2c-nuvoton-nc677x-hwmon-driver.patch'
+        '0002-i2c-nuvoton-nc677x-hwmon-driver.patch'
+        '0003-iwlwifi-mvm-do-not-require-PHY_SKU-NVM-section-for-3168-devices.patch'
         # Bootsplash
         '0001-bootsplash.patch'
         '0002-bootsplash.patch'
@@ -74,6 +75,7 @@ sha256sums=('0c68f5655528aed4f99dae71a5b259edc93239fa899e2df79c055275c21749a1'
             '67aed9742e4281df6f0bd18dc936ae79319fee3763737f158c0e87a6948d100d'
             'd5204941a683ce09f97fd068863e0fe437a15c6e1b87e08bd9a992d65e8b0d38'
             '0556859a8168c8f7da9af8e2059d33216d9e5378d2cac70ca54c5ff843fa5add'
+            '1ca5a951775a3fbdb524d734ee27d5076d95d4bb35532923eecbfa5318ef3402'
             'a504f6cf84094e08eaa3cc5b28440261797bf4f06f04993ee46a20628ff2b53c'
             'e096b127a5208f56d368d2cb938933454d7200d70c86b763aa22c38e0ddb8717'
             '8c1c880f2caa9c7ae43281a35410203887ea8eae750fe8d360d0c8bf80fcc6e0'
@@ -109,7 +111,10 @@ prepare() {
   patch -Np1 -i '../0001-ELAN_touchpad_i2c_hid_pinctrl.patch'
 
   # https://twitter.com/vskye11/status/1216240051639791616
-  patch -Np1 -i '../0001-i2c-nuvoton-nc677x-hwmon-driver.patch'
+  patch -Np1 -i '../0002-i2c-nuvoton-nc677x-hwmon-driver.patch'
+  
+  # https://bugzilla.kernel.org/show_bug.cgi?id=206329
+  patch -Np1 -i ../0003-iwlwifi-mvm-do-not-require-PHY_SKU-NVM-section-for-3168-devices.patch  
 
   # Add bootsplash - http://lkml.iu.edu/hypermail/linux/kernel/1710.3/01542.html
   patch -Np1 -i "${srcdir}/0001-bootsplash.patch"
