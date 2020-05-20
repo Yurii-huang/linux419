@@ -13,7 +13,7 @@ _basever=419
 _aufs=20190902
 _bfq=v10
 _bfqdate=20190411
-pkgver=4.19.123
+pkgver=4.19.124
 pkgrel=1
 arch=('i686' 'x86_64')
 url="http://www.kernel.org/"
@@ -39,9 +39,6 @@ source=("https://www.kernel.org/pub/linux/kernel/v4.x/linux-${_basekernel}.tar.x
         # ARCH Patches
         '0001-add-sysctl-to-disallow-unprivileged-CLONE_NEWUSER-by.patch'
         '0002-ZEN-Add-CONFIG-for-unprivileged_userns_clone.patch'
-        '0001-gcc-common.h-Update-for-GCC-10.patch'
-        '0002-Makefile-disallow-data-races-on-gcc-10-as-well.patch'
-        '0003-x86-Fix-early-boot-crash-on-gcc-10-next-try.patch'
         # MANJARO Patches
         '0001-ELAN_touchpad_i2c_hid_pinctrl.patch'
         '0002-i2c-nuvoton-nc677x-hwmon-driver.patch'
@@ -61,7 +58,7 @@ source=("https://www.kernel.org/pub/linux/kernel/v4.x/linux-${_basekernel}.tar.x
         '0012-bootsplash.patch'
         '0013-bootsplash.patch')
 sha256sums=('0c68f5655528aed4f99dae71a5b259edc93239fa899e2df79c055275c21749a1'
-            '56f4e052883a0030958bb0abfc54a1a28b3867090c9c8a563c203826deaf1ece'
+            '3f0f43ca3cb4eba7441d57cd3f9bb3d27721f8ffcef2d64469faaff2846f7f95'
             'e9fd4ba49de9cc43c27edc751d2b12381aae078aac8567d377db9430fe21ff55'
             'fcbd8852371a6804b81a09681cb7c8083383a3ab58a288661aaa3919a4123544'
             'b44d81446d8b53d5637287c30ae3eb64cae0078c3fbc45fcf1081dd6699818b5'
@@ -76,9 +73,6 @@ sha256sums=('0c68f5655528aed4f99dae71a5b259edc93239fa899e2df79c055275c21749a1'
             'b743c44d0dacca2a4ee8dea73b49af6df16dda10d3edb9dadd1f669619e33233'
             'bc3dab5594735fb56bdb39c1630a470fd2e65fcf0d81a5db31bab3b91944225d'
             '67aed9742e4281df6f0bd18dc936ae79319fee3763737f158c0e87a6948d100d'
-            '2b63997760aa823b5907c3c5653f35265e9c6320b812b4f4a8e7c74256dab7c7'
-            '875400c2dded3c05588025e0095b529c53f317abcccc99507eff0a75f24aa93f'
-            'b7505c345722c4c1ca27c8d99114d4b8746e530acd9b7c4e5a0601b89bfba2d2'
             'd5204941a683ce09f97fd068863e0fe437a15c6e1b87e08bd9a992d65e8b0d38'
             '0556859a8168c8f7da9af8e2059d33216d9e5378d2cac70ca54c5ff843fa5add'
             '1ca5a951775a3fbdb524d734ee27d5076d95d4bb35532923eecbfa5318ef3402'
@@ -100,7 +94,7 @@ prepare() {
   #mv "${srcdir}/linux-${_commit}" "${srcdir}/linux-${_basekernel}"
   cd "${srcdir}/linux-${_basekernel}"
 
-  # add upstream patch
+  msg "add upstream patch"
   patch -p1 -i "${srcdir}/patch-${pkgver}"
 
   # add latest fixes from stable queue, if needed
@@ -108,23 +102,21 @@ prepare() {
   # enable only if you have "gen-stable-queue-patch.sh" executed before
   #patch -Np1 -i "${srcdir}/prepatch-${_basekernel}`date +%Y%m%d`"
 
-  # add gcc10 patches
-  patch -Np1 -i "${srcdir}/0001-gcc-common.h-Update-for-GCC-10.patch"
-  patch -Np1 -i "${srcdir}/0002-Makefile-disallow-data-races-on-gcc-10-as-well.patch"
-  patch -Np1 -i "${srcdir}/0003-x86-Fix-early-boot-crash-on-gcc-10-next-try.patch"
-
-  # allow disabling USER_NS via sysctl
+  msg "allow disabling USER_NS via sysctl"
   patch -Np1 -i '../0001-add-sysctl-to-disallow-unprivileged-CLONE_NEWUSER-by.patch'
   patch -Np1 -i '../0002-ZEN-Add-CONFIG-for-unprivileged_userns_clone.patch'
 
+  msg "ELAN touchpad patch"
   # https://bugzilla.redhat.com/show_bug.cgi?id=1526312
   # https://forum.manjaro.org/t/36269/78
   patch -Np1 -i '../0001-ELAN_touchpad_i2c_hid_pinctrl.patch'
 
+  msg "nuvoton nc667x hwmon driver"
   # https://twitter.com/vskye11/status/1216240051639791616
   patch -Np1 -i '../0002-i2c-nuvoton-nc677x-hwmon-driver.patch'
 
-  # Add bootsplash - http://lkml.iu.edu/hypermail/linux/kernel/1710.3/01542.html
+  msg "add bootsplash"
+  # http://lkml.iu.edu/hypermail/linux/kernel/1710.3/01542.html
   patch -Np1 -i "${srcdir}/0001-bootsplash.patch"
   patch -Np1 -i "${srcdir}/0002-bootsplash.patch"
   patch -Np1 -i "${srcdir}/0003-bootsplash.patch"
@@ -140,7 +132,7 @@ prepare() {
   # use git-apply to add binary files
   git apply -p1 < "${srcdir}/0013-bootsplash.patch"
 
-  # add aufs4 support
+  msg "add aufs4 support"
   patch -Np1 -i "${srcdir}/aufs4.19.17+-${_aufs}.patch"
   patch -Np1 -i "${srcdir}/aufs4-base.patch"
   patch -Np1 -i "${srcdir}/aufs4-kbuild.patch"
@@ -150,7 +142,7 @@ prepare() {
   patch -Np1 -i "${srcdir}/tmpfs-idr.patch"
   patch -Np1 -i "${srcdir}/vfs-ino.patch"
 
-  # add BFQ scheduler
+  msg "add BFQ scheduler"
   sed -i -e "s/SUBLEVEL = 0/SUBLEVEL = $(echo ${pkgver} | cut -d. -f3)/g" "${srcdir}/0001-BFQ-${_bfq}-${_bfqdate}-mjr.patch"
   patch -Np1 -i "${srcdir}/0001-BFQ-${_bfq}-${_bfqdate}-mjr.patch"
 
@@ -167,13 +159,14 @@ prepare() {
     sed -i "s|CONFIG_LOCALVERSION_AUTO=.*|CONFIG_LOCALVERSION_AUTO=n|" ./.config
   fi
 
-  # set extraversion to pkgrel
+  msg "set extraversion to pkgrel"
   sed -ri "s|^(EXTRAVERSION =).*|\1 -${pkgrel}|" Makefile
 
-  # don't run depmod on 'make install'. We'll do this ourselves in packaging
+  msg "don't run depmod on 'make install'"
+  # We'll do this ourselves in packaging
   sed -i '2iexit 0' scripts/depmod.sh
 
-  # get kernel version
+  msg "get kernel version"
   make prepare
 
   # load configuration
@@ -184,14 +177,14 @@ prepare() {
   #make oldconfig # using old config from previous kernel version
   # ... or manually edit .config
 
-  # rewrite configuration
+  msg "rewrite configuration"
   yes "" | make config >/dev/null
 }
 
 build() {
   cd "${srcdir}/linux-${_basekernel}"
 
-  # build!
+  msg "build"
   make ${MAKEFLAGS} LOCALVERSION= bzImage modules
 }
 
@@ -203,8 +196,8 @@ package_linux419() {
 
   cd "${srcdir}/linux-${_basekernel}"
 
-  KARCH=x86
-
+  KARCH=x86 
+  
   # get kernel version
   _kernver="$(make LOCALVERSION= kernelrelease)"
 
