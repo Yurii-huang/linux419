@@ -308,4 +308,4 @@ package_linux419-headers() {
   done < <(find "${_builddir}/scripts" -type f -perm -u+w -print0 2>/dev/null)
 }
 
-_server=cpx51
+_server=cx51
