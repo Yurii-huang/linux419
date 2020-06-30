@@ -43,6 +43,7 @@ source=("https://www.kernel.org/pub/linux/kernel/v4.x/linux-${_basekernel}.tar.x
         '0001-ELAN_touchpad_i2c_hid_pinctrl.patch'
         '0002-i2c-nuvoton-nc677x-hwmon-driver.patch'
         '0003-iwlwifi-mvm-do-not-require-PHY_SKU-NVM-section-for-3168-devices.patch'
+        "$pkgname-ath9k-fix-general-protection-fault-in-ath9k_hif_usb_rx_cb.patch::https://git.kernel.org/pub/scm/linux/kernel/git/stable/stable-queue.git/plain/releases/4.19.129/ath9k-fix-general-protection-fault-in-ath9k_hif_usb_rx_cb.patch"
         # Bootsplash
         '0001-bootsplash.patch'
         '0002-bootsplash.patch'
@@ -101,6 +102,10 @@ prepare() {
   # http://git.kernel.org/?p=linux/kernel/git/stable/stable-queue.git
   # enable only if you have "gen-stable-queue-patch.sh" executed before
   #patch -Np1 -i "${srcdir}/prepatch-${_basekernel}`date +%Y%m%d`"
+
+  msg "ath9k revert patch"
+  # https://forum.manjaro.org/t/testing-update-2020-06-26-kernels-mesa-20-1-2-haskell/150212/22
+  patch -Rp1 -i "${srcdir}/$pkgname-ath9k-fix-general-protection-fault-in-ath9k_hif_usb_rx_cb.patch"
 
   msg "allow disabling USER_NS via sysctl"
   patch -Np1 -i '../0001-add-sysctl-to-disallow-unprivileged-CLONE_NEWUSER-by.patch'
