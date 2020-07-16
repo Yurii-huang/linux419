@@ -13,7 +13,7 @@ _basever=419
 _aufs=20190902
 _bfq=v10
 _bfqdate=20190411
-pkgver=4.19.132
+pkgver=4.19.133
 pkgrel=1
 arch=('i686' 'x86_64')
 url="http://www.kernel.org/"
@@ -33,17 +33,19 @@ source=("https://www.kernel.org/pub/linux/kernel/v4.x/linux-${_basekernel}.tar.x
         'aufs4-standalone.patch'
         'tmpfs-idr.patch'
         'vfs-ino.patch'
-        #"0001-BFQ-${_bfq}-${_bfqdate}.patch::https://github.com/Algodev-github/bfq-mq/compare/0adb328...698937e.patch"
-        #"0001-BFQ-${_bfq}-${_bfqdate}.patch::https://raw.githubusercontent.com/sirlucjan/kernel-patches/master/4.19/bfq-sq-mq/4.19-bfq-sq-mq-v10r1-2K190411-rc1.patch"
+        # BFQ
         "0001-BFQ-${_bfq}-${_bfqdate}-mjr.patch"
         # ARCH Patches
         '0001-add-sysctl-to-disallow-unprivileged-CLONE_NEWUSER-by.patch'
         '0002-ZEN-Add-CONFIG-for-unprivileged_userns_clone.patch'
         # MANJARO Patches
-        '0001-ELAN_touchpad_i2c_hid_pinctrl.patch'
         '0002-i2c-nuvoton-nc677x-hwmon-driver.patch'
-        '0003-iwlwifi-mvm-do-not-require-PHY_SKU-NVM-section-for-3168-devices.patch'
-        "$pkgname-ath9k-fix-general-protection-fault-in-ath9k_hif_usb_rx_cb.patch::https://git.kernel.org/pub/scm/linux/kernel/git/stable/stable-queue.git/plain/releases/4.19.129/ath9k-fix-general-protection-fault-in-ath9k_hif_usb_rx_cb.patch"
+        '0001-iomap-iomap_bmap-should-accept-unwritten-maps.patch'
+         # Lenovo + AMD
+        '0001-nonupstream-navi10-vfio-reset.patch'
+        '0001-lenovo-wmi1.patch'
+        '0001-lenovo-wmi2.patch'
+        '0002-pinctrl-amd.patch'
         # Bootsplash
         '0001-bootsplash.patch'
         '0002-bootsplash.patch'
@@ -72,12 +74,14 @@ sha256sums=('0c68f5655528aed4f99dae71a5b259edc93239fa899e2df79c055275c21749a1'
             'cea84684259922a3b3c484ec609159513ff2f12b2aa34d2697c6fc1c03bda5ec'
             '9c25c5942c4656845744b83facbab97fda3f18747c8f71c129b928a6bda8d89a'
             'b743c44d0dacca2a4ee8dea73b49af6df16dda10d3edb9dadd1f669619e33233'
-            'bc3dab5594735fb56bdb39c1630a470fd2e65fcf0d81a5db31bab3b91944225d'
-            '67aed9742e4281df6f0bd18dc936ae79319fee3763737f158c0e87a6948d100d'
-            'd5204941a683ce09f97fd068863e0fe437a15c6e1b87e08bd9a992d65e8b0d38'
+            'a35ff9384a002ae0ecc7021c1c61fd466214ac9c6c54207fd0cab5c23aadea7b'
+            '1a0781725fa900c0fa62f85013b7e369c058929afd25a5b7c2993f815fb238b2'
             '0556859a8168c8f7da9af8e2059d33216d9e5378d2cac70ca54c5ff843fa5add'
-            '1ca5a951775a3fbdb524d734ee27d5076d95d4bb35532923eecbfa5318ef3402'
-            '715ee8cae71db82f31c486cc0a946a7e9f9eb8d7c69d8bb5c64c35400affef3c'
+            '95745075edd597caa92b369cfbcd11a04c9e3c88c0c987c70114924e1e01df5c'
+            'f1eec160ce5df5c2ea58d4e4fd44a6b1013863c6b3bf649414cd18c89ae500fa'
+            '7d2af76b8dae73946379b967a493b927d76a68bb524b275b7c445bab90995687'
+            '1d58ef2991c625f6f0eb33b4cb8303932f53f1c4694e42bae24c9cd36d2ad013'
+            'ab22f6692c8e3f636b7d07f671d442416555bfc581d01b11ce35a4de0c74418f'
             'a504f6cf84094e08eaa3cc5b28440261797bf4f06f04993ee46a20628ff2b53c'
             'e096b127a5208f56d368d2cb938933454d7200d70c86b763aa22c38e0ddb8717'
             '8c1c880f2caa9c7ae43281a35410203887ea8eae750fe8d360d0c8bf80fcc6e0'
@@ -92,8 +96,6 @@ sha256sums=('0c68f5655528aed4f99dae71a5b259edc93239fa899e2df79c055275c21749a1'
             '60e295601e4fb33d9bf65f198c54c7eb07c0d1e91e2ad1e0dd6cd6e142cb266d'
             '035ea4b2a7621054f4560471f45336b981538a40172d8f17285910d4e0e0b3ef')
 prepare() {
-  #mv "${srcdir}/linux-stable-rc-${_commit}" "${srcdir}/linux-${_basekernel}"
-  #mv "${srcdir}/linux-${_commit}" "${srcdir}/linux-${_basekernel}"
   cd "${srcdir}/linux-${_basekernel}"
 
   msg "add upstream patch"
@@ -104,23 +106,22 @@ prepare() {
   # enable only if you have "gen-stable-queue-patch.sh" executed before
   #patch -Np1 -i "${srcdir}/prepatch-${_basekernel}`date +%Y%m%d`"
 
-  msg "ath9k revert patch"
-  # https://forum.manjaro.org/t/testing-update-2020-06-26-kernels-mesa-20-1-2-haskell/150212/22
-  patch -Rp1 -i "${srcdir}/$pkgname-ath9k-fix-general-protection-fault-in-ath9k_hif_usb_rx_cb.patch"
-
   msg "allow disabling USER_NS via sysctl"
   patch -Np1 -i '../0001-add-sysctl-to-disallow-unprivileged-CLONE_NEWUSER-by.patch'
   patch -Np1 -i '../0002-ZEN-Add-CONFIG-for-unprivileged_userns_clone.patch'
-
-  msg "ELAN touchpad patch"
-  # https://bugzilla.redhat.com/show_bug.cgi?id=1526312
-  # https://forum.manjaro.org/t/36269/78
-  patch -Np1 -i '../0001-ELAN_touchpad_i2c_hid_pinctrl.patch'
 
   msg "nuvoton nc667x hwmon driver"
   # https://twitter.com/vskye11/status/1216240051639791616
   patch -Np1 -i '../0002-i2c-nuvoton-nc677x-hwmon-driver.patch'
 
+  # Lenovo + AMD
+  msg "Lenovo + AMD"
+  patch -Np1 -i "${srcdir}/0001-nonupstream-navi10-vfio-reset.patch"
+
+  patch -Np1 -i '../0001-lenovo-wmi1.patch'
+  patch -Np1 -i '../0001-lenovo-wmi2.patch'
+  patch -Np1 -i '../0002-pinctrl-amd.patch'
+  
   msg "add bootsplash"
   # http://lkml.iu.edu/hypermail/linux/kernel/1710.3/01542.html
   patch -Np1 -i "${srcdir}/0001-bootsplash.patch"
@@ -174,14 +175,6 @@ prepare() {
 
   msg "get kernel version"
   make prepare
-
-  # load configuration
-  # Configure the kernel. Replace the line below with one of your choice.
-  #make menuconfig # CLI menu for configuration
-  #make nconfig # new CLI menu for configuration
-  #make xconfig # X-based configuration
-  #make oldconfig # using old config from previous kernel version
-  # ... or manually edit .config
 
   msg "rewrite configuration"
   yes "" | make config >/dev/null
