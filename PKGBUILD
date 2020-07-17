@@ -14,7 +14,7 @@ _aufs=20190902
 _bfq=v10
 _bfqdate=20190411
 pkgver=4.19.133
-pkgrel=1
+pkgrel=2
 arch=('i686' 'x86_64')
 url="http://www.kernel.org/"
 license=('GPL2')
@@ -41,11 +41,17 @@ source=("https://www.kernel.org/pub/linux/kernel/v4.x/linux-${_basekernel}.tar.x
         # MANJARO Patches
         '0002-i2c-nuvoton-nc677x-hwmon-driver.patch'
         '0001-iomap-iomap_bmap-should-accept-unwritten-maps.patch'
+        # Lenovo P50 multiple fans
+        '0005-thinkpad_acpi_dual_fan_control.patch::https://github.com/dvhart/linux-pdx86/commit/26c16f9d956f269bbc32e034e3ec11c4831137de.patch'
          # Lenovo + AMD
         '0001-nonupstream-navi10-vfio-reset.patch'
         '0001-lenovo-wmi1.patch'
         '0001-lenovo-wmi2.patch'
         '0002-pinctrl-amd.patch'
+        # other patches
+        'ELAN_touchpad_i2c_hid_pinctrl.patch'
+        'lockdep-debug.patch'
+        'proc_mounts.patch'
         # Bootsplash
         '0001-bootsplash.patch'
         '0002-bootsplash.patch'
@@ -61,7 +67,7 @@ source=("https://www.kernel.org/pub/linux/kernel/v4.x/linux-${_basekernel}.tar.x
         '0012-bootsplash.patch'
         '0013-bootsplash.patch')
 sha256sums=('0c68f5655528aed4f99dae71a5b259edc93239fa899e2df79c055275c21749a1'
-            '26463e5bf4da728a0ad6eb8a654d166a1af197d71b6bf0b015eb2d847cdbf217'
+            '513f659cceb303e44c048741708092c0afc0e3e77101c570ecbd82507a3e873e'
             'e9fd4ba49de9cc43c27edc751d2b12381aae078aac8567d377db9430fe21ff55'
             'fcbd8852371a6804b81a09681cb7c8083383a3ab58a288661aaa3919a4123544'
             'b44d81446d8b53d5637287c30ae3eb64cae0078c3fbc45fcf1081dd6699818b5'
@@ -74,14 +80,18 @@ sha256sums=('0c68f5655528aed4f99dae71a5b259edc93239fa899e2df79c055275c21749a1'
             'cea84684259922a3b3c484ec609159513ff2f12b2aa34d2697c6fc1c03bda5ec'
             '9c25c5942c4656845744b83facbab97fda3f18747c8f71c129b928a6bda8d89a'
             'b743c44d0dacca2a4ee8dea73b49af6df16dda10d3edb9dadd1f669619e33233'
-            'a35ff9384a002ae0ecc7021c1c61fd466214ac9c6c54207fd0cab5c23aadea7b'
-            '1a0781725fa900c0fa62f85013b7e369c058929afd25a5b7c2993f815fb238b2'
+            'bc3dab5594735fb56bdb39c1630a470fd2e65fcf0d81a5db31bab3b91944225d'
+            '67aed9742e4281df6f0bd18dc936ae79319fee3763737f158c0e87a6948d100d'
             '0556859a8168c8f7da9af8e2059d33216d9e5378d2cac70ca54c5ff843fa5add'
             '95745075edd597caa92b369cfbcd11a04c9e3c88c0c987c70114924e1e01df5c'
+            'f93707e75ec6be5f289605f913e59d4f3514524a1aab3368f49bf6789723d443'
             'f1eec160ce5df5c2ea58d4e4fd44a6b1013863c6b3bf649414cd18c89ae500fa'
             '7d2af76b8dae73946379b967a493b927d76a68bb524b275b7c445bab90995687'
             '1d58ef2991c625f6f0eb33b4cb8303932f53f1c4694e42bae24c9cd36d2ad013'
             'ab22f6692c8e3f636b7d07f671d442416555bfc581d01b11ce35a4de0c74418f'
+            'd5204941a683ce09f97fd068863e0fe437a15c6e1b87e08bd9a992d65e8b0d38'
+            '1012cdfb4e1b459e4bfac6cd94c9ce021f96858265e590ed6f299d3b4d534299'
+            '42f43306aeb65707ddfcfef705656ca02253cabbb72974c68e171e430aa22b0a'
             'a504f6cf84094e08eaa3cc5b28440261797bf4f06f04993ee46a20628ff2b53c'
             'e096b127a5208f56d368d2cb938933454d7200d70c86b763aa22c38e0ddb8717'
             '8c1c880f2caa9c7ae43281a35410203887ea8eae750fe8d360d0c8bf80fcc6e0'
@@ -117,10 +127,14 @@ prepare() {
   # Lenovo + AMD
   msg "Lenovo + AMD"
   patch -Np1 -i "${srcdir}/0001-nonupstream-navi10-vfio-reset.patch"
-
-  patch -Np1 -i '../0001-lenovo-wmi1.patch'
-  patch -Np1 -i '../0001-lenovo-wmi2.patch'
-  patch -Np1 -i '../0002-pinctrl-amd.patch'
+  patch -Np1 -i "${srcdir}/0001-lenovo-wmi1.patch"
+  patch -Np1 -i "${srcdir}/0001-lenovo-wmi2.patch"
+  patch -Np1 -i "${srcdir}/0002-pinctrl-amd.patch"
+  
+  # other patches
+  patch -Np1 -i "${srcdir}/ELAN_touchpad_i2c_hid_pinctrl.patch"
+  patch -Np1 -i "${srcdir}/lockdep-debug.patch"
+  patch -Np1 -i "${srcdir}/proc_mounts.patch"
   
   msg "add bootsplash"
   # http://lkml.iu.edu/hypermail/linux/kernel/1710.3/01542.html
