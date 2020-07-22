@@ -1,9 +1,12 @@
-# Based on the file created for Arch Linux by:
+# Maintainer: Philip Müller <philm[at]manjaro[dot]org>
+# Maintainer: Helmut Stult <helmut[at]manjaro[dot]org>
+
+# Arch credits:
 # Tobias Powalowski <tpowa@archlinux.org>
 # Thomas Baechler <thomas@archlinux.org>
 
-# Maintainer: Philip Müller (x86_64) <philm@manjaro.org>
-# Maintainer: Jonathon Fernyhough (i686) <jonathon@manjaro.org>
+# Cloud Server
+_server=cpx51
 
 pkgbase=linux419
 pkgname=('linux419' 'linux419-headers')
@@ -13,9 +16,9 @@ _basever=419
 _aufs=20190902
 _bfq=v10
 _bfqdate=20190411
-pkgver=4.19.133
-pkgrel=2
-arch=('i686' 'x86_64')
+pkgver=4.19.134
+pkgrel=1
+arch=('x86_64')
 url="http://www.kernel.org/"
 license=('GPL2')
 makedepends=('xmlto' 'docbook-xsl' 'kmod' 'inetutils' 'bc' 'elfutils' 'git')
@@ -23,7 +26,7 @@ options=('!strip')
 source=("https://www.kernel.org/pub/linux/kernel/v4.x/linux-${_basekernel}.tar.xz"
         "http://www.kernel.org/pub/linux/kernel/v4.x/patch-${pkgver}.xz"
         # the main kernel config files
-        'config.x86_64' 'config' 'config.aufs'
+        'config' 'config.aufs'
         # AUFS Patches
         "aufs4.19.17+-${_aufs}.patch"
         'aufs4-base.patch'
@@ -67,9 +70,8 @@ source=("https://www.kernel.org/pub/linux/kernel/v4.x/linux-${_basekernel}.tar.x
         '0012-bootsplash.patch'
         '0013-bootsplash.patch')
 sha256sums=('0c68f5655528aed4f99dae71a5b259edc93239fa899e2df79c055275c21749a1'
-            '513f659cceb303e44c048741708092c0afc0e3e77101c570ecbd82507a3e873e'
-            'e9fd4ba49de9cc43c27edc751d2b12381aae078aac8567d377db9430fe21ff55'
-            'fcbd8852371a6804b81a09681cb7c8083383a3ab58a288661aaa3919a4123544'
+            'c3865e98700c524e78ce4b802b3dcbd8318a9fc1ded3a37f99325a73d3ca971d'
+            '1e1097bb510e4a7a96357fe1a9d4904fb607da39a7a9cac3f7529b11ff2f08bb'
             'b44d81446d8b53d5637287c30ae3eb64cae0078c3fbc45fcf1081dd6699818b5'
             'da3769061d2eefe3958f06a77dc73ee82cabf636f69e1f55ff2c02b7d1126f8c'
             'a37bdc6cbbf2f69977c2725fa651e6ee137205acea81d5c00d5ce9bf4bec004b'
@@ -167,11 +169,7 @@ prepare() {
   sed -i -e "s/SUBLEVEL = 0/SUBLEVEL = $(echo ${pkgver} | cut -d. -f3)/g" "${srcdir}/0001-BFQ-${_bfq}-${_bfqdate}-mjr.patch"
   patch -Np1 -i "${srcdir}/0001-BFQ-${_bfq}-${_bfqdate}-mjr.patch"
 
-  if [ "${CARCH}" = "x86_64" ]; then
-    cat "${srcdir}/config.x86_64" > ./.config
-  else
-    cat "${srcdir}/config" > ./.config
-  fi
+  cat "${srcdir}/config" > ./.config
 
   cat "${srcdir}/config.aufs" >> ./.config
 
@@ -226,11 +224,7 @@ package_linux419() {
   echo "${_basekernel}-${CARCH}" | install -Dm644 /dev/stdin "${pkgdir}/usr/lib/modules/${_kernver}/kernelbase"
 
   # add kernel version
-  if [ "${CARCH}" = "x86_64" ]; then
-     echo "${pkgver}-${pkgrel}-MANJARO x64" > "${pkgdir}/boot/${pkgbase}-${CARCH}.kver"
-  else
-     echo "${pkgver}-${pkgrel}-MANJARO x32" > "${pkgdir}/boot/${pkgbase}-${CARCH}.kver"
-  fi
+  echo "${pkgver}-${pkgrel}-MANJARO x64" > "${pkgdir}/boot/${pkgbase}-${CARCH}.kver"
 
   # make room for external modules
   local _extramodules="extramodules-${_basekernel}${_kernelname:--MANJARO}"
@@ -290,10 +284,8 @@ package_linux419-headers() {
   # copy in Kconfig files
   find . -name Kconfig\* -exec install -Dm644 {} "${_builddir}/{}" \;
 
-  if [ "${CARCH}" = "x86_64" ]; then
-    # add objtool for external module building and enabled VALIDATION_STACK option
-    install -Dt "${_builddir}/tools/objtool" tools/objtool/objtool
-  fi
+  # add objtool for external module building and enabled VALIDATION_STACK option
+  install -Dt "${_builddir}/tools/objtool" tools/objtool/objtool
 
   # remove unneeded architectures
   local _arch
@@ -320,5 +312,3 @@ package_linux419-headers() {
     /usr/bin/strip ${_strip} "${_binary}"
   done < <(find "${_builddir}/scripts" -type f -perm -u+w -print0 2>/dev/null)
 }
-
-_server=cpx51
