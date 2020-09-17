@@ -17,7 +17,7 @@ _basever=419
 _aufs=20190902
 _bfq=v10
 _bfqdate=20190411
-pkgver=4.19.145
+pkgver=4.19.146
 pkgrel=1
 arch=('x86_64')
 url="http://www.kernel.org/"
@@ -57,6 +57,8 @@ source=("https://www.kernel.org/pub/linux/kernel/v4.x/linux-${_basekernel}.tar.x
         'lockdep-debug.patch'
         'proc_mounts.patch'
         # Bootsplash
+        '0001-revert-fbcon-remove-now-unusued-softback_lines-cursor-argument.patch'
+        '0002-revert-fbcon-remove-soft-scrollback-code.patch'
         '0001-bootsplash.patch'
         '0002-bootsplash.patch'
         '0003-bootsplash.patch'
@@ -71,8 +73,8 @@ source=("https://www.kernel.org/pub/linux/kernel/v4.x/linux-${_basekernel}.tar.x
         '0012-bootsplash.patch'
         '0013-bootsplash.patch')
 sha256sums=('0c68f5655528aed4f99dae71a5b259edc93239fa899e2df79c055275c21749a1'
-            'cf66f81deaac38ffd44d86ea5ac2925dc77662b8daf566537459b1953a1aa1f7'
-            '1e1097bb510e4a7a96357fe1a9d4904fb607da39a7a9cac3f7529b11ff2f08bb'
+            '65dcb7ed7241ec26e50b5b657a597c8a2f4a576ada514963720ac16a99bb7a84'
+            'b220d788cbc83dbc7836c9e5766f3e13ef19139b3abb99e659ffafb9253b641a'
             'b44d81446d8b53d5637287c30ae3eb64cae0078c3fbc45fcf1081dd6699818b5'
             'da3769061d2eefe3958f06a77dc73ee82cabf636f69e1f55ff2c02b7d1126f8c'
             'a37bdc6cbbf2f69977c2725fa651e6ee137205acea81d5c00d5ce9bf4bec004b'
@@ -95,6 +97,8 @@ sha256sums=('0c68f5655528aed4f99dae71a5b259edc93239fa899e2df79c055275c21749a1'
             'd5204941a683ce09f97fd068863e0fe437a15c6e1b87e08bd9a992d65e8b0d38'
             '1012cdfb4e1b459e4bfac6cd94c9ce021f96858265e590ed6f299d3b4d534299'
             '42f43306aeb65707ddfcfef705656ca02253cabbb72974c68e171e430aa22b0a'
+            'ddf1e7fc55cc6fe81ecfcac84112e573ca95713c027bc84d69cf880812fd6ff3'
+            '07835f57f49edffbd8daed1b1f420819172d5a16091dbe3d437f02759f9e8c1d'
             'a504f6cf84094e08eaa3cc5b28440261797bf4f06f04993ee46a20628ff2b53c'
             'e096b127a5208f56d368d2cb938933454d7200d70c86b763aa22c38e0ddb8717'
             '8c1c880f2caa9c7ae43281a35410203887ea8eae750fe8d360d0c8bf80fcc6e0'
@@ -141,6 +145,10 @@ prepare() {
   
   msg "add bootsplash"
   # http://lkml.iu.edu/hypermail/linux/kernel/1710.3/01542.html
+  msg2 "0001-revert-fbcon-remove-now-unusued-softback_lines-cursor-argument.patch"
+  patch -Np1 -i "${srcdir}/0001-revert-fbcon-remove-now-unusued-softback_lines-cursor-argument.patch"
+  msg2 "0002-revert-fbcon-remove-soft-scrollback-code.patch"
+  patch -Np1 -i "${srcdir}/0002-revert-fbcon-remove-soft-scrollback-code.patch"
   patch -Np1 -i "${srcdir}/0001-bootsplash.patch"
   patch -Np1 -i "${srcdir}/0002-bootsplash.patch"
   patch -Np1 -i "${srcdir}/0003-bootsplash.patch"
