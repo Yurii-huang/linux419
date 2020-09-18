@@ -27,7 +27,7 @@
  	src = vc->vc_font.data + ((c & charmask) * (w * vc->vc_font.height));
 --- b/drivers/video/fbdev/core/fbcon.c
 +++ a/drivers/video/fbdev/core/fbcon.c
-@@ -394,7 +394,7 @@
+@@ -376,7 +376,7 @@
  	c = scr_readw((u16 *) vc->vc_pos);
  	mode = (!ops->cursor_flash || ops->cursor_state.enable) ?
  		CM_ERASE : CM_DRAW;
@@ -36,7 +36,7 @@
  		    get_color(vc, info, c, 0));
  	console_unlock();
  }
-@@ -1345,7 +1345,7 @@
+@@ -1306,7 +1306,7 @@
  
  	ops->cursor_flash = (mode == CM_ERASE) ? 0 : 1;
  
