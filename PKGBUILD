@@ -17,15 +17,21 @@ _basever=419
 _aufs=20190902
 _bfq=v10
 _bfqdate=20190411
-pkgver=4.19.146
+pkgver=4.19.147
 pkgrel=1
 arch=('x86_64')
 url="http://www.kernel.org/"
 license=('GPL2')
-makedepends=('xmlto' 'docbook-xsl' 'kmod' 'inetutils' 'bc' 'elfutils' 'git')
+makedepends=('bc'
+    'docbook-xsl'
+    'elfutils'
+    'git'
+    'inetutils'
+    'kmod'
+    'xmlto')
 options=('!strip')
 source=("https://www.kernel.org/pub/linux/kernel/v4.x/linux-${_basekernel}.tar.xz"
-        "http://www.kernel.org/pub/linux/kernel/v4.x/patch-${pkgver}.xz"
+        "https://www.kernel.org/pub/linux/kernel/v4.x/patch-${pkgver}.xz"
         # the main kernel config files
         'config' 'config.aufs'
         # AUFS Patches
@@ -41,40 +47,40 @@ source=("https://www.kernel.org/pub/linux/kernel/v4.x/linux-${_basekernel}.tar.x
         "0001-BFQ-${_bfq}-${_bfqdate}-mjr.patch"
         # ARCH Patches
         '0001-add-sysctl-to-disallow-unprivileged-CLONE_NEWUSER-by.patch'
-        '0002-ZEN-Add-CONFIG-for-unprivileged_userns_clone.patch'
+        '0001-ZEN-Add-CONFIG-for-unprivileged_userns_clone.patch'
         # MANJARO Patches
-        '0002-i2c-nuvoton-nc677x-hwmon-driver.patch'
-        '0001-iomap-iomap_bmap-should-accept-unwritten-maps.patch'
+        '0101-i2c-nuvoton-nc677x-hwmon-driver.patch'
         # Lenovo P50 multiple fans
         '0005-thinkpad_acpi_dual_fan_control.patch::https://github.com/dvhart/linux-pdx86/commit/26c16f9d956f269bbc32e034e3ec11c4831137de.patch'
          # Lenovo + AMD
-        '0001-nonupstream-navi10-vfio-reset.patch'
-        '0001-lenovo-wmi1.patch'
-        '0001-lenovo-wmi2.patch'
-        '0002-pinctrl-amd.patch'
+        '0301-nonupstream-navi10-vfio-reset.patch'
+        '0302-lenovo-wmi1.patch'
+        '0302-lenovo-wmi2.patch'
+        '0303-pinctrl-amd.patch'
         # other patches
         'ELAN_touchpad_i2c_hid_pinctrl.patch'
         'lockdep-debug.patch'
         'proc_mounts.patch'
         # Bootsplash
-        '0001-revert-fbcon-remove-now-unusued-softback_lines-cursor-argument.patch'
-        '0002-revert-fbcon-remove-soft-scrollback-code.patch'
-        '0001-bootsplash.patch'
-        '0002-bootsplash.patch'
-        '0003-bootsplash.patch'
-        '0004-bootsplash.patch'
-        '0005-bootsplash.patch'
-        '0006-bootsplash.patch'
-        '0007-bootsplash.patch'
-        '0008-bootsplash.patch'
-        '0009-bootsplash.patch'
-        '0010-bootsplash.patch'
-        '0011-bootsplash.patch'
-        '0012-bootsplash.patch'
-        '0013-bootsplash.patch')
+        '0401-revert-fbcon-remove-now-unusued-softback_lines-cursor-argument.patch'
+        '0402-revert-fbcon-remove-soft-scrollback-code.patch'
+        '0501-bootsplash.patch'
+        '0502-bootsplash.patch'
+        '0503-bootsplash.patch'
+        '0504-bootsplash.patch'
+        '0505-bootsplash.patch'
+        '0506-bootsplash.patch'
+        '0507-bootsplash.patch'
+        '0508-bootsplash.patch'
+        '0509-bootsplash.patch'
+        '0510-bootsplash.patch'
+        '0511-bootsplash.patch'
+        '0512-bootsplash.patch'
+        '0513-bootsplash.patch'
+)
 sha256sums=('0c68f5655528aed4f99dae71a5b259edc93239fa899e2df79c055275c21749a1'
-            '65dcb7ed7241ec26e50b5b657a597c8a2f4a576ada514963720ac16a99bb7a84'
-            'b220d788cbc83dbc7836c9e5766f3e13ef19139b3abb99e659ffafb9253b641a'
+            'b13d5ff0faca99f5bf07e5705bdf2bf28b7a3bc666542085e891c4df8c0bbd61'
+            '3348d01ba504a39913979e6baf990d9549e1d2cd7bbb633dbe9d6cfa4a39ef76'
             'b44d81446d8b53d5637287c30ae3eb64cae0078c3fbc45fcf1081dd6699818b5'
             'da3769061d2eefe3958f06a77dc73ee82cabf636f69e1f55ff2c02b7d1126f8c'
             'a37bdc6cbbf2f69977c2725fa651e6ee137205acea81d5c00d5ce9bf4bec004b'
@@ -88,7 +94,6 @@ sha256sums=('0c68f5655528aed4f99dae71a5b259edc93239fa899e2df79c055275c21749a1'
             'bc3dab5594735fb56bdb39c1630a470fd2e65fcf0d81a5db31bab3b91944225d'
             '67aed9742e4281df6f0bd18dc936ae79319fee3763737f158c0e87a6948d100d'
             '7823d7488f42bc4ed7dfae6d1014dbde679d8b862c9a3697a39ba0dae5918978'
-            '95745075edd597caa92b369cfbcd11a04c9e3c88c0c987c70114924e1e01df5c'
             'f93707e75ec6be5f289605f913e59d4f3514524a1aab3368f49bf6789723d443'
             'f1eec160ce5df5c2ea58d4e4fd44a6b1013863c6b3bf649414cd18c89ae500fa'
             '7d2af76b8dae73946379b967a493b927d76a68bb524b275b7c445bab90995687'
@@ -125,18 +130,18 @@ prepare() {
 
   msg "allow disabling USER_NS via sysctl"
   patch -Np1 -i '../0001-add-sysctl-to-disallow-unprivileged-CLONE_NEWUSER-by.patch'
-  patch -Np1 -i '../0002-ZEN-Add-CONFIG-for-unprivileged_userns_clone.patch'
+  patch -Np1 -i '../0001-ZEN-Add-CONFIG-for-unprivileged_userns_clone.patch'
 
-  msg "nuvoton nc667x hwmon driver"
-  # https://twitter.com/vskye11/status/1216240051639791616
-  patch -Np1 -i '../0002-i2c-nuvoton-nc677x-hwmon-driver.patch'
+  msg "MANJARO Patches"
+  msg2 "0101-i2c-nuvoton-nc677x-hwmon-driver.patch"
+  patch -Np1 -i '../0101-i2c-nuvoton-nc677x-hwmon-driver.patch'
 
   # Lenovo + AMD
   msg "Lenovo + AMD"
-  patch -Np1 -i "${srcdir}/0001-nonupstream-navi10-vfio-reset.patch"
-  patch -Np1 -i "${srcdir}/0001-lenovo-wmi1.patch"
-  patch -Np1 -i "${srcdir}/0001-lenovo-wmi2.patch"
-  patch -Np1 -i "${srcdir}/0002-pinctrl-amd.patch"
+  patch -Np1 -i "${srcdir}/0301-nonupstream-navi10-vfio-reset.patch"
+  patch -Np1 -i "${srcdir}/0302-lenovo-wmi1.patch"
+  patch -Np1 -i "${srcdir}/0302-lenovo-wmi2.patch"
+  patch -Np1 -i "${srcdir}/0303-pinctrl-amd.patch"
   
   # other patches
   patch -Np1 -i "${srcdir}/ELAN_touchpad_i2c_hid_pinctrl.patch"
@@ -144,25 +149,24 @@ prepare() {
   patch -Np1 -i "${srcdir}/proc_mounts.patch"
   
   msg "add bootsplash"
-  # http://lkml.iu.edu/hypermail/linux/kernel/1710.3/01542.html
-  msg2 "0001-revert-fbcon-remove-now-unusued-softback_lines-cursor-argument.patch"
-  patch -Np1 -i "${srcdir}/0001-revert-fbcon-remove-now-unusued-softback_lines-cursor-argument.patch"
-  msg2 "0002-revert-fbcon-remove-soft-scrollback-code.patch"
-  patch -Np1 -i "${srcdir}/0002-revert-fbcon-remove-soft-scrollback-code.patch"
-  patch -Np1 -i "${srcdir}/0001-bootsplash.patch"
-  patch -Np1 -i "${srcdir}/0002-bootsplash.patch"
-  patch -Np1 -i "${srcdir}/0003-bootsplash.patch"
-  patch -Np1 -i "${srcdir}/0004-bootsplash.patch"
-  patch -Np1 -i "${srcdir}/0005-bootsplash.patch"
-  patch -Np1 -i "${srcdir}/0006-bootsplash.patch"
-  patch -Np1 -i "${srcdir}/0007-bootsplash.patch"
-  patch -Np1 -i "${srcdir}/0008-bootsplash.patch"
-  patch -Np1 -i "${srcdir}/0009-bootsplash.patch"
-  patch -Np1 -i "${srcdir}/0010-bootsplash.patch"
-  patch -Np1 -i "${srcdir}/0011-bootsplash.patch"
-  patch -Np1 -i "${srcdir}/0012-bootsplash.patch"
+  msg2 "0401-revert-fbcon-remove-now-unusued-softback_lines-cursor-argument.patch"
+  patch -Np1 -i "${srcdir}/0401-revert-fbcon-remove-now-unusued-softback_lines-cursor-argument.patch"
+  msg2 "0402-revert-fbcon-remove-soft-scrollback-code.patch"
+  patch -Np1 -i "${srcdir}/0402-revert-fbcon-remove-soft-scrollback-code.patch"
+  patch -Np1 -i "${srcdir}/0501-bootsplash.patch"
+  patch -Np1 -i "${srcdir}/0502-bootsplash.patch"
+  patch -Np1 -i "${srcdir}/0503-bootsplash.patch"
+  patch -Np1 -i "${srcdir}/0504-bootsplash.patch"
+  patch -Np1 -i "${srcdir}/0505-bootsplash.patch"
+  patch -Np1 -i "${srcdir}/0506-bootsplash.patch"
+  patch -Np1 -i "${srcdir}/0507-bootsplash.patch"
+  patch -Np1 -i "${srcdir}/0508-bootsplash.patch"
+  patch -Np1 -i "${srcdir}/0509-bootsplash.patch"
+  patch -Np1 -i "${srcdir}/0510-bootsplash.patch"
+  patch -Np1 -i "${srcdir}/0511-bootsplash.patch"
+  patch -Np1 -i "${srcdir}/0512-bootsplash.patch"
   # use git-apply to add binary files
-  git apply -p1 < "${srcdir}/0013-bootsplash.patch"
+  git apply -p1 < "${srcdir}/0513-bootsplash.patch"
 
   msg "add aufs4 support"
   patch -Np1 -i "${srcdir}/aufs4.19.17+-${_aufs}.patch"
@@ -216,8 +220,6 @@ package_linux419() {
 
   cd "${srcdir}/linux-${_basekernel}"
 
-  KARCH=x86 
-  
   # get kernel version
   _kernver="$(make LOCALVERSION= kernelrelease)"
 
@@ -267,14 +269,10 @@ package_linux419-headers() {
 
   cp -t "${_builddir}" -a include scripts
 
-  install -Dt "${_builddir}/arch/${KARCH}" -m644 "arch/${KARCH}/Makefile"
-  install -Dt "${_builddir}/arch/${KARCH}/kernel" -m644 "arch/${KARCH}/kernel/asm-offsets.s"
+  install -Dt "${_builddir}/arch/x86" -m644 "arch/x86/Makefile"
+  install -Dt "${_builddir}/arch/x86/kernel" -m644 "arch/x86/kernel/asm-offsets.s"
 
-  if [ "${CARCH}" = "i686" ]; then
-    install -Dt "${_builddir}/arch/${KARCH}" -m644 "arch/${KARCH}/Makefile_32.cpu"
-  fi
-
-  cp -t "${_builddir}/arch/${KARCH}" -a "arch/${KARCH}/include"
+  cp -t "${_builddir}/arch/x86" -a "arch/x86/include"
 
   install -Dt "${_builddir}/drivers/md" -m644 drivers/md/*.h
   install -Dt "${_builddir}/net/mac80211" -m644 net/mac80211/*.h
