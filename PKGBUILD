@@ -50,14 +50,13 @@ source=("https://www.kernel.org/pub/linux/kernel/v4.x/linux-${_basekernel}.tar.x
         '0001-ZEN-Add-CONFIG-for-unprivileged_userns_clone.patch'
         # MANJARO Patches
         '0101-i2c-nuvoton-nc677x-hwmon-driver.patch'
+        'ELAN_touchpad_i2c_hid_pinctrl.patch'        
         # Lenovo P50 multiple fans
         '0005-thinkpad_acpi_dual_fan_control.patch::https://github.com/dvhart/linux-pdx86/commit/26c16f9d956f269bbc32e034e3ec11c4831137de.patch'
          # Lenovo + AMD
         '0302-lenovo-wmi1.patch'
         '0302-lenovo-wmi2.patch'
         '0303-pinctrl-amd.patch'
-        # other patches
-        'ELAN_touchpad_i2c_hid_pinctrl.patch'
         # Bootsplash
         '0401-revert-fbcon-remove-now-unusued-softback_lines-cursor-argument.patch'
         '0402-revert-fbcon-remove-soft-scrollback-code.patch'
@@ -91,11 +90,11 @@ sha256sums=('0c68f5655528aed4f99dae71a5b259edc93239fa899e2df79c055275c21749a1'
             'bc3dab5594735fb56bdb39c1630a470fd2e65fcf0d81a5db31bab3b91944225d'
             '67aed9742e4281df6f0bd18dc936ae79319fee3763737f158c0e87a6948d100d'
             '7823d7488f42bc4ed7dfae6d1014dbde679d8b862c9a3697a39ba0dae5918978'
+            'd5204941a683ce09f97fd068863e0fe437a15c6e1b87e08bd9a992d65e8b0d38'
             'ec31bf16d63e640bb0b782aa0bb1f371e7659ef82b401c8ce352a59af4361719'
             '7d2af76b8dae73946379b967a493b927d76a68bb524b275b7c445bab90995687'
             '1d58ef2991c625f6f0eb33b4cb8303932f53f1c4694e42bae24c9cd36d2ad013'
             'ab22f6692c8e3f636b7d07f671d442416555bfc581d01b11ce35a4de0c74418f'
-            'd5204941a683ce09f97fd068863e0fe437a15c6e1b87e08bd9a992d65e8b0d38'
             'd94c3f5b637b480a2d527a78d0a774fc2ac7e814e7d44d8ee362ca947cdc3747'
             '6ba09cc2b4cbd33af86fe22915cccd3b91c93d1e08de9e0b482004c782e71fc9'
             'a504f6cf84094e08eaa3cc5b28440261797bf4f06f04993ee46a20628ff2b53c'
@@ -127,17 +126,20 @@ prepare() {
   patch -Np1 -i '../0001-ZEN-Add-CONFIG-for-unprivileged_userns_clone.patch'
 
   msg "MANJARO Patches"
+  # https://twitter.com/vskye11/status/1216240051639791616
   msg2 "0101-i2c-nuvoton-nc677x-hwmon-driver.patch"
   patch -Np1 -i '../0101-i2c-nuvoton-nc677x-hwmon-driver.patch'
+
+  msg "ELAN touchpad patch"
+  # https://bugzilla.redhat.com/show_bug.cgi?id=1526312
+  # https://forum.manjaro.org/t/36269/78
+  patch -Np1 -i "${srcdir}/ELAN_touchpad_i2c_hid_pinctrl.patch"  
 
   # Lenovo + AMD
   msg "Lenovo + AMD"
   patch -Np1 -i "${srcdir}/0302-lenovo-wmi1.patch"
   patch -Np1 -i "${srcdir}/0302-lenovo-wmi2.patch"
   patch -Np1 -i "${srcdir}/0303-pinctrl-amd.patch"
-  
-  # other patches
-  patch -Np1 -i "${srcdir}/ELAN_touchpad_i2c_hid_pinctrl.patch"
   
   msg "add bootsplash"
   msg2 "0401-revert-fbcon-remove-now-unusued-softback_lines-cursor-argument.patch"
