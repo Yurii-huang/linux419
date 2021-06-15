@@ -18,7 +18,7 @@ _aufs=20190902
 _bfq=v10
 _bfqdate=20190411
 pkgver=4.19.194
-pkgrel=1
+pkgrel=2
 arch=('x86_64')
 url="http://www.kernel.org/"
 license=('GPL2')
@@ -58,8 +58,6 @@ source=("https://www.kernel.org/pub/linux/kernel/v4.x/linux-${_basekernel}.tar.x
         '0303-pinctrl-amd.patch'
         # other patches
         'ELAN_touchpad_i2c_hid_pinctrl.patch'
-        'lockdep-debug.patch'
-        'proc_mounts.patch'
         # Bootsplash
         '0401-revert-fbcon-remove-now-unusued-softback_lines-cursor-argument.patch'
         '0402-revert-fbcon-remove-soft-scrollback-code.patch'
@@ -98,8 +96,6 @@ sha256sums=('0c68f5655528aed4f99dae71a5b259edc93239fa899e2df79c055275c21749a1'
             '1d58ef2991c625f6f0eb33b4cb8303932f53f1c4694e42bae24c9cd36d2ad013'
             'ab22f6692c8e3f636b7d07f671d442416555bfc581d01b11ce35a4de0c74418f'
             'd5204941a683ce09f97fd068863e0fe437a15c6e1b87e08bd9a992d65e8b0d38'
-            '1012cdfb4e1b459e4bfac6cd94c9ce021f96858265e590ed6f299d3b4d534299'
-            '42f43306aeb65707ddfcfef705656ca02253cabbb72974c68e171e430aa22b0a'
             'd94c3f5b637b480a2d527a78d0a774fc2ac7e814e7d44d8ee362ca947cdc3747'
             '6ba09cc2b4cbd33af86fe22915cccd3b91c93d1e08de9e0b482004c782e71fc9'
             'a504f6cf84094e08eaa3cc5b28440261797bf4f06f04993ee46a20628ff2b53c'
@@ -142,8 +138,6 @@ prepare() {
   
   # other patches
   patch -Np1 -i "${srcdir}/ELAN_touchpad_i2c_hid_pinctrl.patch"
-  patch -Np1 -i "${srcdir}/lockdep-debug.patch"
-  patch -Np1 -i "${srcdir}/proc_mounts.patch"
   
   msg "add bootsplash"
   msg2 "0401-revert-fbcon-remove-now-unusued-softback_lines-cursor-argument.patch"
