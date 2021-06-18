@@ -24,11 +24,16 @@ url="http://www.kernel.org/"
 license=('GPL2')
 makedepends=('bc'
     'docbook-xsl'
-    'elfutils'
+    'libelf'
+    'pahole'
     'git'
     'inetutils'
     'kmod'
-    'xmlto')
+    'xmlto'
+    'cpio'
+    'perl'
+    'tar'
+    'xz')
 options=('!strip')
 source=("https://www.kernel.org/pub/linux/kernel/v4.x/linux-${_basekernel}.tar.xz"
         "https://www.kernel.org/pub/linux/kernel/v4.x/patch-${pkgver}.xz"
@@ -243,13 +248,11 @@ package_linux419() {
 
   # now we call depmod...
   depmod -b "${pkgdir}/usr" -F System.map "${_kernver}"
-
-  # add vmlinux
-  install -Dt "${pkgdir}/usr/lib/modules/${_kernver}/build" -m644 vmlinux
 }
 
 package_linux419-headers() {
   pkgdesc="Header files and scripts for building modules for ${pkgbase/linux/Linux} kernel"
+  depends=('gawk' 'python' 'libelf' 'pahole')
   provides=("linux-headers=$pkgver")
 
   cd "${srcdir}/linux-${_basekernel}"
@@ -257,6 +260,7 @@ package_linux419-headers() {
 
   install -Dt "${_builddir}" -m644 Makefile .config Module.symvers
   install -Dt "${_builddir}/kernel" -m644 kernel/Makefile
+  install -Dt "${_builddir}" -m644 vmlinux  
 
   mkdir "${_builddir}/.tmp_versions"
 
@@ -294,21 +298,28 @@ package_linux419-headers() {
     rm -r "${_arch}"
   done
 
-  # remove files already in linux-docs package
+  # remove documentation files
   rm -r "${_builddir}/Documentation"
+
+  # strip scripts directory
+  local file
+  while read -rd '' file; do
+    case "$(file -bi "$file")" in
+      application/x-sharedlib\;*)      # Libraries (.so)
+        strip $STRIP_SHARED "$file" ;;
+      application/x-archive\;*)        # Libraries (.a)
+        strip $STRIP_STATIC "$file" ;;
+      application/x-executable\;*)     # Binaries
+        strip $STRIP_BINARIES "$file" ;;
+      application/x-pie-executable\;*) # Relocatable binaries
+        strip $STRIP_SHARED "$file" ;;
+    esac
+  done < <(find "${_builddir}" -type f -perm -u+x ! -name vmlinux -print0 2>/dev/null)
+  strip $STRIP_STATIC "${_builddir}/vmlinux"
+  
+  # remove unwanted files
+  find ${_builddir} -name '*.orig' -delete
 
   # Fix permissions
   chmod -R u=rwX,go=rX "${_builddir}"
-
-  # strip scripts directory
-  local _binary _strip
-  while read -rd '' _binary; do
-    case "$(file -bi "${_binary}")" in
-      *application/x-sharedlib*)  _strip="${STRIP_SHARED}"   ;; # Libraries (.so)
-      *application/x-archive*)    _strip="${STRIP_STATIC}"   ;; # Libraries (.a)
-      *application/x-executable*) _strip="${STRIP_BINARIES}" ;; # Binaries
-      *) continue ;;
-    esac
-    /usr/bin/strip ${_strip} "${_binary}"
-  done < <(find "${_builddir}/scripts" -type f -perm -u+w -print0 2>/dev/null)
 }
