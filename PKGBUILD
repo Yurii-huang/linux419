@@ -6,9 +6,6 @@
 # Tobias Powalowski <tpowa@archlinux.org>
 # Thomas Baechler <thomas@archlinux.org>
 
-# Cloud Server
-_server=cpx51
-
 pkgbase=linux419
 pkgname=('linux419' 'linux419-headers')
 _kernelname=-MANJARO
