@@ -14,7 +14,7 @@ _basever=419
 _aufs=20190902
 _bfq=v10
 _bfqdate=20190411
-pkgver=4.19.198
+pkgver=4.19.199
 pkgrel=1
 arch=('x86_64')
 url="https://www.kernel.org/"
@@ -77,7 +77,7 @@ source=("https://www.kernel.org/pub/linux/kernel/v4.x/linux-${_basekernel}.tar.x
         '0513-bootsplash.patch'
 )
 sha256sums=('0c68f5655528aed4f99dae71a5b259edc93239fa899e2df79c055275c21749a1'
-            'cd53eaf3f36e60539a66394ab20a5efdd6d13fea3fe0289519985db04dac8808'
+            '3cf1782bd950b926956ccaf45d2d6c4adcf59cabcaffcad2b9e6b251ae65ad66'
             '70495ffa3667cef64f50510ce2e917d622b4b81380971e23ea974012e81f172d'
             'b44d81446d8b53d5637287c30ae3eb64cae0078c3fbc45fcf1081dd6699818b5'
             'da3769061d2eefe3958f06a77dc73ee82cabf636f69e1f55ff2c02b7d1126f8c'
@@ -113,15 +113,11 @@ sha256sums=('0c68f5655528aed4f99dae71a5b259edc93239fa899e2df79c055275c21749a1'
             '60e295601e4fb33d9bf65f198c54c7eb07c0d1e91e2ad1e0dd6cd6e142cb266d'
             '035ea4b2a7621054f4560471f45336b981538a40172d8f17285910d4e0e0b3ef')
 prepare() {
-  cd "${srcdir}/linux-${_basekernel}"
+  cd "linux-${_basekernel}"
 
   msg "add upstream patch"
-  patch -p1 -i "${srcdir}/patch-${pkgver}"
+  patch -p1 -i "../patch-${pkgver}"
 
-  # add latest fixes from stable queue, if needed
-  # https://git.kernel.org/?p=linux/kernel/git/stable/stable-queue.git
-  # enable only if you have "gen-stable-queue-patch.sh" executed before
-  #patch -Np1 -i "${srcdir}/prepatch-${_basekernel}`date +%Y%m%d`"
 
   msg "allow disabling USER_NS via sysctl"
   patch -Np1 -i '../0001-add-sysctl-to-disallow-unprivileged-CLONE_NEWUSER-by.patch'
@@ -135,51 +131,52 @@ prepare() {
   msg "ELAN touchpad patch"
   # https://bugzilla.redhat.com/show_bug.cgi?id=1526312
   # https://forum.manjaro.org/t/36269/78
-  patch -Np1 -i "${srcdir}/ELAN_touchpad_i2c_hid_pinctrl.patch"  
+  patch -Np1 -i "../ELAN_touchpad_i2c_hid_pinctrl.patch"  
 
   # Lenovo + AMD
   msg "Lenovo + AMD"
-  patch -Np1 -i "${srcdir}/0302-lenovo-wmi1.patch"
-  patch -Np1 -i "${srcdir}/0302-lenovo-wmi2.patch"
-  patch -Np1 -i "${srcdir}/0303-pinctrl-amd.patch"
-  
+  patch -Np1 -i "../0302-lenovo-wmi1.patch"
+  patch -Np1 -i "../0302-lenovo-wmi2.patch"
+  patch -Np1 -i "../0303-pinctrl-amd.patch"
+
   msg "add bootsplash"
   msg2 "0401-revert-fbcon-remove-now-unusued-softback_lines-cursor-argument.patch"
-  patch -Np1 -i "${srcdir}/0401-revert-fbcon-remove-now-unusued-softback_lines-cursor-argument.patch"
+  patch -Np1 -i "../0401-revert-fbcon-remove-now-unusued-softback_lines-cursor-argument.patch"
   msg2 "0402-revert-fbcon-remove-soft-scrollback-code.patch"
-  patch -Np1 -i "${srcdir}/0402-revert-fbcon-remove-soft-scrollback-code.patch"
-  patch -Np1 -i "${srcdir}/0501-bootsplash.patch"
-  patch -Np1 -i "${srcdir}/0502-bootsplash.patch"
-  patch -Np1 -i "${srcdir}/0503-bootsplash.patch"
-  patch -Np1 -i "${srcdir}/0504-bootsplash.patch"
-  patch -Np1 -i "${srcdir}/0505-bootsplash.patch"
-  patch -Np1 -i "${srcdir}/0506-bootsplash.patch"
-  patch -Np1 -i "${srcdir}/0507-bootsplash.patch"
-  patch -Np1 -i "${srcdir}/0508-bootsplash.patch"
-  patch -Np1 -i "${srcdir}/0509-bootsplash.patch"
-  patch -Np1 -i "${srcdir}/0510-bootsplash.patch"
-  patch -Np1 -i "${srcdir}/0511-bootsplash.patch"
-  patch -Np1 -i "${srcdir}/0512-bootsplash.patch"
+  patch -Np1 -i "../0402-revert-fbcon-remove-soft-scrollback-code.patch"
+  msg2 "501"
+  patch -Np1 -i "../0501-bootsplash.patch"
+  patch -Np1 -i "../0502-bootsplash.patch"
+  patch -Np1 -i "../0503-bootsplash.patch"
+  patch -Np1 -i "../0504-bootsplash.patch"
+  patch -Np1 -i "../0505-bootsplash.patch"
+  patch -Np1 -i "../0506-bootsplash.patch"
+  patch -Np1 -i "../0507-bootsplash.patch"
+  patch -Np1 -i "../0508-bootsplash.patch"
+  patch -Np1 -i "../0509-bootsplash.patch"
+  patch -Np1 -i "../0510-bootsplash.patch"
+  patch -Np1 -i "../0511-bootsplash.patch"
+  patch -Np1 -i "../0512-bootsplash.patch"
   # use git-apply to add binary files
-  git apply -p1 < "${srcdir}/0513-bootsplash.patch"
+  git apply -p1 < "../0513-bootsplash.patch"
 
   msg "add aufs4 support"
-  patch -Np1 -i "${srcdir}/aufs4.19.17+-${_aufs}.patch"
-  patch -Np1 -i "${srcdir}/aufs4-base.patch"
-  patch -Np1 -i "${srcdir}/aufs4-kbuild.patch"
-  patch -Np1 -i "${srcdir}/aufs4-loopback.patch"
-  patch -Np1 -i "${srcdir}/aufs4-mmap.patch"
-  patch -Np1 -i "${srcdir}/aufs4-standalone.patch"
-  patch -Np1 -i "${srcdir}/tmpfs-idr.patch"
-  patch -Np1 -i "${srcdir}/vfs-ino.patch"
+  patch -Np1 -i "../aufs4.19.17+-${_aufs}.patch"
+  patch -Np1 -i "../aufs4-base.patch"
+  patch -Np1 -i "../aufs4-kbuild.patch"
+  patch -Np1 -i "../aufs4-loopback.patch"
+  patch -Np1 -i "../aufs4-mmap.patch"
+  patch -Np1 -i "../aufs4-standalone.patch"
+  patch -Np1 -i "../tmpfs-idr.patch"
+  patch -Np1 -i "../vfs-ino.patch"
 
   msg "add BFQ scheduler"
-  sed -i -e "s/SUBLEVEL = 0/SUBLEVEL = $(echo ${pkgver} | cut -d. -f3)/g" "${srcdir}/0001-BFQ-${_bfq}-${_bfqdate}-mjr.patch"
-  patch -Np1 -i "${srcdir}/0001-BFQ-${_bfq}-${_bfqdate}-mjr.patch"
+  sed -i -e "s/SUBLEVEL = 0/SUBLEVEL = $(echo ${pkgver} | cut -d. -f3)/g" "../0001-BFQ-${_bfq}-${_bfqdate}-mjr.patch"
+  patch -Np1 -i "../0001-BFQ-${_bfq}-${_bfqdate}-mjr.patch"
 
-  cat "${srcdir}/config" > ./.config
+  cat "../config" > ./.config
 
-  cat "${srcdir}/config.aufs" >> ./.config
+  cat "../config.aufs" >> ./.config
 
   if [ "${_kernelname}" != "" ]; then
     sed -i "s|CONFIG_LOCALVERSION=.*|CONFIG_LOCALVERSION=\"${_kernelname}\"|g" ./.config
@@ -201,7 +198,7 @@ prepare() {
 }
 
 build() {
-  cd "${srcdir}/linux-${_basekernel}"
+  cd "linux-${_basekernel}"
 
   msg "build"
   make ${MAKEFLAGS} LOCALVERSION= bzImage modules
@@ -213,7 +210,7 @@ package_linux419() {
   optdepends=('crda: to set the correct wireless channels of your country')
   provides=("linux=${pkgver}")
 
-  cd "${srcdir}/linux-${_basekernel}"
+  cd "linux-${_basekernel}"
 
   # get kernel version
   _kernver="$(make LOCALVERSION= kernelrelease)"
@@ -252,7 +249,7 @@ package_linux419-headers() {
   depends=('gawk' 'python' 'libelf' 'pahole')
   provides=("linux-headers=$pkgver")
 
-  cd "${srcdir}/linux-${_basekernel}"
+  cd "linux-${_basekernel}"
   local _builddir="${pkgdir}/usr/lib/modules/${_kernver}/build"
 
   install -Dt "${_builddir}" -m644 Makefile .config Module.symvers
