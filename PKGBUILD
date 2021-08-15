@@ -1,6 +1,5 @@
 # Maintainer: Philip Müller <philm[at]manjaro[dot]org>
 # Maintainer: Bernhard Landauer <bernhard[at]manjaro[dot]org>
-# Maintainer: Helmut Stult <helmut[at]manjaro[dot]org>
 
 # Arch credits:
 # Tobias Powalowski <tpowa@archlinux.org>
@@ -14,7 +13,7 @@ _basever=419
 _aufs=20190902
 _bfq=v10
 _bfqdate=20190411
-pkgver=4.19.203
+pkgver=4.19.204
 pkgrel=1
 arch=('x86_64')
 url="https://www.kernel.org/"
@@ -77,7 +76,7 @@ source=("https://www.kernel.org/pub/linux/kernel/v4.x/linux-${_basekernel}.tar.x
         '0513-bootsplash.patch'
 )
 sha256sums=('0c68f5655528aed4f99dae71a5b259edc93239fa899e2df79c055275c21749a1'
-            '8875caa404ebff44e660f5bb462a9bf8aabb8375a9b8f06954fff665824c80dd'
+            '08231a94e8b932e4d95e428443ef202f1d3ec53136efffbdb10bdf81f5fb8a02'
             '70495ffa3667cef64f50510ce2e917d622b4b81380971e23ea974012e81f172d'
             'b44d81446d8b53d5637287c30ae3eb64cae0078c3fbc45fcf1081dd6699818b5'
             'da3769061d2eefe3958f06a77dc73ee82cabf636f69e1f55ff2c02b7d1126f8c'
