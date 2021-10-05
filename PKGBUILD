@@ -315,7 +315,4 @@ package_linux419-headers() {
   
   # remove unwanted files
   find ${_builddir} -name '*.orig' -delete
-
-  # Fix permissions
-  chmod -R u=rwX,go=rX "${_builddir}"
 }
