@@ -4,6 +4,7 @@ broadcom-wl
 ndiswrapper
 nvidia
 nvidia-390xx
+nvidia-470xx
 nvidiabl
 r8168
 rtl8723bu
