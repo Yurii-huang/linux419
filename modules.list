@@ -8,7 +8,7 @@ nvidia-470xx
 nvidiabl
 r8168
 rtl8723bu
-spl_zfs
 tp_smapi
 vhba-module
 virtualbox-modules
+zfs
