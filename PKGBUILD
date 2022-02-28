@@ -207,7 +207,7 @@ package_linux419() {
   pkgdesc="The ${pkgbase/linux/Linux} kernel and modules"
   depends=('coreutils' 'linux-firmware' 'kmod' 'mkinitcpio>=27')
   optdepends=('crda: to set the correct wireless channels of your country')
-  provides=("linux=${pkgver}" VIRTUALBOX-GUEST-MODULES WIREGUARD-MODULE)
+  provides=("linux=${pkgver}" VIRTUALBOX-GUEST-MODULES)
 
   cd "linux-${_basekernel}"
 
