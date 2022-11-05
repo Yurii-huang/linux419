@@ -14,7 +14,7 @@ _aufs=20190902
 _bfq=v10
 _bfqdate=20190411
 pkgver=4.19.264
-pkgrel=1
+pkgrel=2
 arch=('x86_64')
 url="https://www.kernel.org/"
 license=('GPL2')
@@ -53,7 +53,7 @@ source=("https://www.kernel.org/pub/linux/kernel/v4.x/linux-${_basekernel}.tar.x
         '0101-i2c-nuvoton-nc677x-hwmon-driver.patch'
         'ELAN_touchpad_i2c_hid_pinctrl.patch'
         # add modules.builtin.modinfo
-        '898490c010b.patch'        
+        '898490c010b.patch'
         # Lenovo P50 multiple fans
         '0005-thinkpad_acpi_dual_fan_control.patch::https://github.com/dvhart/linux-pdx86/commit/26c16f9d956f269bbc32e034e3ec11c4831137de.patch'
          # Lenovo + AMD
