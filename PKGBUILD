@@ -134,7 +134,7 @@ prepare() {
   # https://bugzilla.redhat.com/show_bug.cgi?id=1526312
   # https://forum.manjaro.org/t/36269/78
   patch -Np1 -i "../ELAN_touchpad_i2c_hid_pinctrl.patch"
-  
+
   msg "Add modules.builtin.modinfo"
   patch -Np1 -i "../898490c010b.patch"
 
@@ -211,7 +211,7 @@ build() {
 
 package_linux419() {
   pkgdesc="The ${pkgbase/linux/Linux} kernel and modules"
-  depends=('coreutils' 'linux-firmware' 'kmod' 'mkinitcpio>=27')
+  depends=('coreutils' 'linux-firmware' 'kmod' 'initramfs')
   optdepends=('wireless-regdb: to set the correct wireless channels of your country')
   provides=("linux=${pkgver}" VIRTUALBOX-GUEST-MODULES)
 
@@ -259,7 +259,7 @@ package_linux419-headers() {
 
   install -Dt "${_builddir}" -m644 Makefile .config Module.symvers
   install -Dt "${_builddir}/kernel" -m644 kernel/Makefile
-  install -Dt "${_builddir}" -m644 vmlinux  
+  install -Dt "${_builddir}" -m644 vmlinux
 
   mkdir "${_builddir}/.tmp_versions"
 
@@ -318,7 +318,7 @@ package_linux419-headers() {
     esac
   done < <(find "${_builddir}" -type f -perm -u+x ! -name vmlinux -print0 2>/dev/null)
   strip $STRIP_STATIC "${_builddir}/vmlinux"
-  
+
   # remove unwanted files
   find ${_builddir} -name '*.orig' -delete
 }
