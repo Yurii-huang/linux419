@@ -1,7 +1,6 @@
 acpi_call
 bbswitch
 broadcom-wl
-ndiswrapper
 nvidia
 nvidia-390xx
 nvidia-470xx
