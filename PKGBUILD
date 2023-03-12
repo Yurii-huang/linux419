@@ -14,7 +14,7 @@ _aufs=20190902
 _bfq=v10
 _bfqdate=20190411
 pkgver=4.19.276
-pkgrel=1
+pkgrel=2
 arch=('x86_64')
 url="https://www.kernel.org/"
 license=('GPL2')
@@ -52,6 +52,7 @@ source=("https://www.kernel.org/pub/linux/kernel/v4.x/linux-${_basekernel}.tar.x
         # MANJARO Patches
         '0101-i2c-nuvoton-nc677x-hwmon-driver.patch'
         'ELAN_touchpad_i2c_hid_pinctrl.patch'
+        '0201-Wifi-Fix.patch'
         # add modules.builtin.modinfo
         '898490c010b.patch'
         # Lenovo P50 multiple fans
@@ -94,6 +95,7 @@ sha256sums=('0c68f5655528aed4f99dae71a5b259edc93239fa899e2df79c055275c21749a1'
             '67aed9742e4281df6f0bd18dc936ae79319fee3763737f158c0e87a6948d100d'
             '7823d7488f42bc4ed7dfae6d1014dbde679d8b862c9a3697a39ba0dae5918978'
             'd5204941a683ce09f97fd068863e0fe437a15c6e1b87e08bd9a992d65e8b0d38'
+            '45a38989354436ac398d81c1132b697410a6c8c3c010610655a51fac45dce761'
             '1a4b6378407e2fc3b84fdffa22ce74de326992bb2e927411607b78cf6a31374e'
             'ec31bf16d63e640bb0b782aa0bb1f371e7659ef82b401c8ce352a59af4361719'
             '7d2af76b8dae73946379b967a493b927d76a68bb524b275b7c445bab90995687'
@@ -129,6 +131,9 @@ prepare() {
   # https://twitter.com/vskye11/status/1216240051639791616
   msg2 "0101-i2c-nuvoton-nc677x-hwmon-driver.patch"
   patch -Np1 -i '../0101-i2c-nuvoton-nc677x-hwmon-driver.patch'
+
+  # wifi: cfg80211: Partial revert "wifi: cfg80211: Fix use after free for wext
+  patch -Np1 -i '../0201-Wifi-Fix.patch'
 
   msg "ELAN touchpad patch"
   # https://bugzilla.redhat.com/show_bug.cgi?id=1526312
