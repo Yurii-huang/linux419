@@ -52,7 +52,6 @@ source=("https://www.kernel.org/pub/linux/kernel/v4.x/linux-${_basekernel}.tar.x
         # MANJARO Patches
         '0101-i2c-nuvoton-nc677x-hwmon-driver.patch'
         'ELAN_touchpad_i2c_hid_pinctrl.patch'
-        '0201-Wifi-Fix.patch'
         # add modules.builtin.modinfo
         '898490c010b.patch'
         # Lenovo P50 multiple fans
@@ -80,7 +79,7 @@ source=("https://www.kernel.org/pub/linux/kernel/v4.x/linux-${_basekernel}.tar.x
 )
 sha256sums=('0c68f5655528aed4f99dae71a5b259edc93239fa899e2df79c055275c21749a1'
             'c0bb242260561ada2198ad75849cd9c5e57ac13850eb7b6740a8a5f5713bc05b'
-            '970fb7387edeca4edbb297691820957bb1fdeecb5a921556cdb213d15af1818e'
+            '9d26671ced194f64dfd8316b06466d8064c98a3b8e74690b1901ea2e9a0b4a0b'
             'b44d81446d8b53d5637287c30ae3eb64cae0078c3fbc45fcf1081dd6699818b5'
             'da3769061d2eefe3958f06a77dc73ee82cabf636f69e1f55ff2c02b7d1126f8c'
             'a37bdc6cbbf2f69977c2725fa651e6ee137205acea81d5c00d5ce9bf4bec004b'
@@ -95,7 +94,6 @@ sha256sums=('0c68f5655528aed4f99dae71a5b259edc93239fa899e2df79c055275c21749a1'
             '67aed9742e4281df6f0bd18dc936ae79319fee3763737f158c0e87a6948d100d'
             '7823d7488f42bc4ed7dfae6d1014dbde679d8b862c9a3697a39ba0dae5918978'
             'd5204941a683ce09f97fd068863e0fe437a15c6e1b87e08bd9a992d65e8b0d38'
-            '45a38989354436ac398d81c1132b697410a6c8c3c010610655a51fac45dce761'
             '1a4b6378407e2fc3b84fdffa22ce74de326992bb2e927411607b78cf6a31374e'
             'ec31bf16d63e640bb0b782aa0bb1f371e7659ef82b401c8ce352a59af4361719'
             '7d2af76b8dae73946379b967a493b927d76a68bb524b275b7c445bab90995687'
@@ -131,9 +129,6 @@ prepare() {
   # https://twitter.com/vskye11/status/1216240051639791616
   msg2 "0101-i2c-nuvoton-nc677x-hwmon-driver.patch"
   patch -Np1 -i '../0101-i2c-nuvoton-nc677x-hwmon-driver.patch'
-
-  # wifi: cfg80211: Partial revert "wifi: cfg80211: Fix use after free for wext
-  patch -Np1 -i '../0201-Wifi-Fix.patch'
 
   msg "ELAN touchpad patch"
   # https://bugzilla.redhat.com/show_bug.cgi?id=1526312
