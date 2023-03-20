@@ -57,8 +57,6 @@ source=("https://www.kernel.org/pub/linux/kernel/v4.x/linux-${_basekernel}.tar.x
         #'revert-drm-i915-don-t-use-bar-mappings-for-ring-buffers-with-llc.patch'
         # add modules.builtin.modinfo
         '898490c010b.patch'
-        # Lenovo P50 multiple fans
-        '0005-thinkpad_acpi_dual_fan_control.patch::https://github.com/dvhart/linux-pdx86/commit/26c16f9d956f269bbc32e034e3ec11c4831137de.patch'
          # Lenovo + AMD
         '0302-lenovo-wmi1.patch'
         '0302-lenovo-wmi2.patch'
@@ -99,7 +97,6 @@ sha256sums=('0c68f5655528aed4f99dae71a5b259edc93239fa899e2df79c055275c21749a1'
             '7823d7488f42bc4ed7dfae6d1014dbde679d8b862c9a3697a39ba0dae5918978'
             'd5204941a683ce09f97fd068863e0fe437a15c6e1b87e08bd9a992d65e8b0d38'
             '1a4b6378407e2fc3b84fdffa22ce74de326992bb2e927411607b78cf6a31374e'
-            'ec31bf16d63e640bb0b782aa0bb1f371e7659ef82b401c8ce352a59af4361719'
             '7d2af76b8dae73946379b967a493b927d76a68bb524b275b7c445bab90995687'
             '1d58ef2991c625f6f0eb33b4cb8303932f53f1c4694e42bae24c9cd36d2ad013'
             'ab22f6692c8e3f636b7d07f671d442416555bfc581d01b11ce35a4de0c74418f'
