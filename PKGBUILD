@@ -78,7 +78,7 @@ source=("https://www.kernel.org/pub/linux/kernel/v4.x/linux-${_basekernel}.tar.x
         '0510-bootsplash.patch'
         '0511-bootsplash.patch'
         '0512-bootsplash.patch'
-        '0513-bootsplash.patch'
+        '0513-bootsplash.gitpatch'
 )
 sha256sums=('0c68f5655528aed4f99dae71a5b259edc93239fa899e2df79c055275c21749a1'
             '2ed184319135fa294c3f4c9ba9f7769d3fba6381b10c4c2220d8fd87e4119988'
@@ -120,71 +120,26 @@ sha256sums=('0c68f5655528aed4f99dae71a5b259edc93239fa899e2df79c055275c21749a1'
             '035ea4b2a7621054f4560471f45336b981538a40172d8f17285910d4e0e0b3ef')
 prepare() {
   cd "linux-${_basekernel}"
+  
+  sed -i -e "s/SUBLEVEL = 0/SUBLEVEL = $(echo ${pkgver} | cut -d. -f3)/g" "../0001-BFQ-${_bfq}-${_bfqdate}-mjr.patch"
 
   msg "add upstream patch"
   #patch -p1 -i "../patch-${pkgver}"
   patch -p1 -i "../patch-4.19.278"
   patch -p1 -i "../patch-4.19.279-rc1"
 
+  local src
+  for src in "${source[@]}"; do
+      src="${src%%::*}"
+      src="${src##*/}"
+      [[ $src = *.patch ]] || continue
+      msg2 "Applying patch: $src..."
+      patch -Np1 < "../$src"
+  done
 
-  msg "allow disabling USER_NS via sysctl"
-  patch -Np1 -i '../0001-add-sysctl-to-disallow-unprivileged-CLONE_NEWUSER-by.patch'
-  patch -Np1 -i '../0001-ZEN-Add-CONFIG-for-unprivileged_userns_clone.patch'
-
-  msg "MANJARO Patches"
-  # https://twitter.com/vskye11/status/1216240051639791616
-  msg2 "0101-i2c-nuvoton-nc677x-hwmon-driver.patch"
-  patch -Np1 -i '../0101-i2c-nuvoton-nc677x-hwmon-driver.patch'
-
-  msg "ELAN touchpad patch"
-  # https://bugzilla.redhat.com/show_bug.cgi?id=1526312
-  # https://forum.manjaro.org/t/36269/78
-  patch -Np1 -i "../ELAN_touchpad_i2c_hid_pinctrl.patch"
-
-  msg "Add modules.builtin.modinfo"
-  patch -Np1 -i "../898490c010b.patch"
-
-  # Lenovo + AMD
-  msg "Lenovo + AMD"
-  patch -Np1 -i "../0302-lenovo-wmi1.patch"
-  patch -Np1 -i "../0302-lenovo-wmi2.patch"
-  patch -Np1 -i "../0303-pinctrl-amd.patch"
-
-  msg "add bootsplash"
-  msg2 "0401-revert-fbcon-remove-now-unusued-softback_lines-cursor-argument.patch"
-  patch -Np1 -i "../0401-revert-fbcon-remove-now-unusued-softback_lines-cursor-argument.patch"
-  msg2 "0402-revert-fbcon-remove-soft-scrollback-code.patch"
-  patch -Np1 -i "../0402-revert-fbcon-remove-soft-scrollback-code.patch"
-  msg2 "501"
-  patch -Np1 -i "../0501-bootsplash.patch"
-  patch -Np1 -i "../0502-bootsplash.patch"
-  patch -Np1 -i "../0503-bootsplash.patch"
-  patch -Np1 -i "../0504-bootsplash.patch"
-  patch -Np1 -i "../0505-bootsplash.patch"
-  patch -Np1 -i "../0506-bootsplash.patch"
-  patch -Np1 -i "../0507-bootsplash.patch"
-  patch -Np1 -i "../0508-bootsplash.patch"
-  patch -Np1 -i "../0509-bootsplash.patch"
-  patch -Np1 -i "../0510-bootsplash.patch"
-  patch -Np1 -i "../0511-bootsplash.patch"
-  patch -Np1 -i "../0512-bootsplash.patch"
-  # use git-apply to add binary files
-  git apply -p1 < "../0513-bootsplash.patch"
-
-  msg "add aufs4 support"
-  patch -Np1 -i "../aufs4.19.17+-${_aufs}.patch"
-  patch -Np1 -i "../aufs4-base.patch"
-  patch -Np1 -i "../aufs4-kbuild.patch"
-  patch -Np1 -i "../aufs4-loopback.patch"
-  patch -Np1 -i "../aufs4-mmap.patch"
-  patch -Np1 -i "../aufs4-standalone.patch"
-  patch -Np1 -i "../tmpfs-idr.patch"
-  patch -Np1 -i "../vfs-ino.patch"
-
-  msg "add BFQ scheduler"
-  sed -i -e "s/SUBLEVEL = 0/SUBLEVEL = $(echo ${pkgver} | cut -d. -f3)/g" "../0001-BFQ-${_bfq}-${_bfqdate}-mjr.patch"
-  patch -Np1 -i "../0001-BFQ-${_bfq}-${_bfqdate}-mjr.patch"
-
+  msg2 "0513-bootsplash"
+  git apply -p1 < "../0513-bootsplash.gitpatch"
+  
   cat "../config" > ./.config
 
   cat "../config.aufs" >> ./.config
