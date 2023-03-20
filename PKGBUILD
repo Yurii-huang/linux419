@@ -13,8 +13,8 @@ _basever=419
 _aufs=20190902
 _bfq=v10
 _bfqdate=20190411
-pkgver=4.19.278
-pkgrel=2
+pkgver=4.19.279
+pkgrel=0
 arch=('x86_64')
 url="https://www.kernel.org/"
 license=('GPL2')
@@ -32,7 +32,9 @@ makedepends=('bc'
     'xz')
 options=('!strip')
 source=("https://www.kernel.org/pub/linux/kernel/v4.x/linux-${_basekernel}.tar.xz"
-        "https://www.kernel.org/pub/linux/kernel/v4.x/patch-${pkgver}.xz"
+        #"https://www.kernel.org/pub/linux/kernel/v4.x/patch-${pkgver}.xz"
+        "https://www.kernel.org/pub/linux/kernel/v4.x/patch-4.19.278.xz"
+        "https://mirrors.edge.kernel.org/pub/linux/kernel/v4.x/stable-review/patch-4.19.279-rc1.xz"
         # the main kernel config files
         'config' 'config.aufs'
         # AUFS Patches
@@ -52,7 +54,7 @@ source=("https://www.kernel.org/pub/linux/kernel/v4.x/linux-${_basekernel}.tar.x
         # MANJARO Patches
         '0101-i2c-nuvoton-nc677x-hwmon-driver.patch'
         'ELAN_touchpad_i2c_hid_pinctrl.patch'
-        'revert-drm-i915-don-t-use-bar-mappings-for-ring-buffers-with-llc.patch'
+        #'revert-drm-i915-don-t-use-bar-mappings-for-ring-buffers-with-llc.patch'
         # add modules.builtin.modinfo
         '898490c010b.patch'
         # Lenovo P50 multiple fans
@@ -80,6 +82,7 @@ source=("https://www.kernel.org/pub/linux/kernel/v4.x/linux-${_basekernel}.tar.x
 )
 sha256sums=('0c68f5655528aed4f99dae71a5b259edc93239fa899e2df79c055275c21749a1'
             '2ed184319135fa294c3f4c9ba9f7769d3fba6381b10c4c2220d8fd87e4119988'
+            'e46afb62b06995f5baeffd93d9bdb54bc530ff088c9915f87644b93d82e0402a'
             '9d26671ced194f64dfd8316b06466d8064c98a3b8e74690b1901ea2e9a0b4a0b'
             'b44d81446d8b53d5637287c30ae3eb64cae0078c3fbc45fcf1081dd6699818b5'
             'da3769061d2eefe3958f06a77dc73ee82cabf636f69e1f55ff2c02b7d1126f8c'
@@ -95,7 +98,6 @@ sha256sums=('0c68f5655528aed4f99dae71a5b259edc93239fa899e2df79c055275c21749a1'
             '67aed9742e4281df6f0bd18dc936ae79319fee3763737f158c0e87a6948d100d'
             '7823d7488f42bc4ed7dfae6d1014dbde679d8b862c9a3697a39ba0dae5918978'
             'd5204941a683ce09f97fd068863e0fe437a15c6e1b87e08bd9a992d65e8b0d38'
-            '09791d4dd859274516b8cc5c7a04627ff5d77b931289931f6b4b7adb6d11b857'
             '1a4b6378407e2fc3b84fdffa22ce74de326992bb2e927411607b78cf6a31374e'
             'ec31bf16d63e640bb0b782aa0bb1f371e7659ef82b401c8ce352a59af4361719'
             '7d2af76b8dae73946379b967a493b927d76a68bb524b275b7c445bab90995687'
@@ -120,7 +122,9 @@ prepare() {
   cd "linux-${_basekernel}"
 
   msg "add upstream patch"
-  patch -p1 -i "../patch-${pkgver}"
+  #patch -p1 -i "../patch-${pkgver}"
+  patch -p1 -i "../patch-4.19.278"
+  patch -p1 -i "../patch-4.19.279-rc1"
 
 
   msg "allow disabling USER_NS via sysctl"
