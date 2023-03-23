@@ -14,7 +14,7 @@ _aufs=20190902
 _bfq=v10
 _bfqdate=20190411
 pkgver=4.19.279
-pkgrel=1
+pkgrel=2
 arch=('x86_64')
 url="https://www.kernel.org/"
 license=('GPL2')
@@ -32,9 +32,7 @@ makedepends=('bc'
     'xz')
 options=('!strip')
 source=("https://www.kernel.org/pub/linux/kernel/v4.x/linux-${_basekernel}.tar.xz"
-        #"https://www.kernel.org/pub/linux/kernel/v4.x/patch-${pkgver}.xz"
-        "https://www.kernel.org/pub/linux/kernel/v4.x/patch-4.19.278.xz"
-        "https://mirrors.edge.kernel.org/pub/linux/kernel/v4.x/stable-review/patch-4.19.279-rc1.xz"
+        "https://www.kernel.org/pub/linux/kernel/v4.x/patch-${pkgver}.xz"
         # the main kernel config files
         'config' 'config.aufs'
         # AUFS Patches
@@ -79,8 +77,7 @@ source=("https://www.kernel.org/pub/linux/kernel/v4.x/linux-${_basekernel}.tar.x
         '0513-bootsplash.gitpatch'
 )
 sha256sums=('0c68f5655528aed4f99dae71a5b259edc93239fa899e2df79c055275c21749a1'
-            '2ed184319135fa294c3f4c9ba9f7769d3fba6381b10c4c2220d8fd87e4119988'
-            'e46afb62b06995f5baeffd93d9bdb54bc530ff088c9915f87644b93d82e0402a'
+            'dbd7943b851a4832bdc8d9481242e8f86c18cbe4ae3f848238e078e8ddb0c253'
             '9d26671ced194f64dfd8316b06466d8064c98a3b8e74690b1901ea2e9a0b4a0b'
             'b44d81446d8b53d5637287c30ae3eb64cae0078c3fbc45fcf1081dd6699818b5'
             'da3769061d2eefe3958f06a77dc73ee82cabf636f69e1f55ff2c02b7d1126f8c'
@@ -121,9 +118,7 @@ prepare() {
   sed -i -e "s/SUBLEVEL = 0/SUBLEVEL = $(echo ${pkgver} | cut -d. -f3)/g" "../0001-BFQ-${_bfq}-${_bfqdate}-mjr.patch"
 
   msg "add upstream patch"
-  #patch -p1 -i "../patch-${pkgver}"
-  patch -p1 -i "../patch-4.19.278"
-  patch -p1 -i "../patch-4.19.279-rc1"
+  patch -p1 -i "../patch-${pkgver}"
 
   local src
   for src in "${source[@]}"; do
