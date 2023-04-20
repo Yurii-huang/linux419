@@ -1,6 +1,6 @@
 #
 # Automatically generated file; DO NOT EDIT.
-# Linux/x86 4.19.277-1 Kernel Configuration
+# Linux/x86 4.19.281-1 Kernel Configuration
 #
 
 #
@@ -2994,6 +2994,7 @@ CONFIG_IXGBE_DCB=y
 CONFIG_IXGBEVF=m
 CONFIG_I40E=m
 CONFIG_I40E_DCB=y
+CONFIG_IAVF=m
 CONFIG_I40EVF=m
 CONFIG_ICE=m
 CONFIG_FM10K=m
