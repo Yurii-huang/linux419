@@ -14,7 +14,7 @@ _aufs=20190902
 _bfq=v10
 _bfqdate=20190411
 pkgver=4.19.282
-pkgrel=1
+pkgrel=2
 arch=('x86_64')
 url="https://www.kernel.org/"
 license=('GPL2')
@@ -78,7 +78,7 @@ source=("https://www.kernel.org/pub/linux/kernel/v4.x/linux-${_basekernel}.tar.x
 )
 sha256sums=('0c68f5655528aed4f99dae71a5b259edc93239fa899e2df79c055275c21749a1'
             '53ee72be410464f464598475a9c9485cf93bfe7e396256a32ce92d4048efe27e'
-            '457fc1c8fffd4fa8c2c5e01e6e481c01d3580eff1c8df2a74bb38e8f5d7a83f7'
+            '1dd77b2133a4865b836086dc6e553252ea05293f122bf3397e34186c6b427f74'
             'b44d81446d8b53d5637287c30ae3eb64cae0078c3fbc45fcf1081dd6699818b5'
             'da3769061d2eefe3958f06a77dc73ee82cabf636f69e1f55ff2c02b7d1126f8c'
             'a37bdc6cbbf2f69977c2725fa651e6ee137205acea81d5c00d5ce9bf4bec004b'
