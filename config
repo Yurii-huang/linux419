@@ -1,6 +1,6 @@
 #
 # Automatically generated file; DO NOT EDIT.
-# Linux/x86 4.19.297-1 Kernel Configuration
+# Linux/x86 4.19.298-1 Kernel Configuration
 #
 
 #
@@ -2294,7 +2294,6 @@ CONFIG_BLK_DEV_DRBD=m
 # CONFIG_DRBD_FAULT_INJECTION is not set
 CONFIG_BLK_DEV_NBD=m
 CONFIG_BLK_DEV_SKD=m
-CONFIG_BLK_DEV_SX8=m
 CONFIG_BLK_DEV_RAM=m
 CONFIG_BLK_DEV_RAM_COUNT=16
 CONFIG_BLK_DEV_RAM_SIZE=16384
