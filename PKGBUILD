@@ -13,7 +13,7 @@ _basever=419
 _aufs=20190902
 _bfq=v10
 _bfqdate=20190411
-pkgver=4.19.302
+pkgver=4.19.303
 pkgrel=1
 arch=('x86_64')
 url="https://www.kernel.org/"
@@ -77,7 +77,7 @@ source=("https://www.kernel.org/pub/linux/kernel/v4.x/linux-${_basekernel}.tar.x
         '0513-bootsplash.gitpatch'
 )
 sha256sums=('0c68f5655528aed4f99dae71a5b259edc93239fa899e2df79c055275c21749a1'
-            'a6dd468519f2466021cf0bcb64dcc77293e850712eef552edcb87414cdcf5353'
+            '3e822348af03a3d09dd53d0788bf5f12e13d0e49fb3fa549185034320cc96c9e'
             'bb1eec3af1e004764b63d6d11d103bcc0b69e8b2cfd6ca30fe9cfd8daae75205'
             'b44d81446d8b53d5637287c30ae3eb64cae0078c3fbc45fcf1081dd6699818b5'
             'da3769061d2eefe3958f06a77dc73ee82cabf636f69e1f55ff2c02b7d1126f8c'
