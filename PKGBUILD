@@ -114,7 +114,7 @@ sha256sums=('0c68f5655528aed4f99dae71a5b259edc93239fa899e2df79c055275c21749a1'
             '035ea4b2a7621054f4560471f45336b981538a40172d8f17285910d4e0e0b3ef')
 prepare() {
   cd "linux-${_basekernel}"
-  
+
   sed -i -e "s/SUBLEVEL = 0/SUBLEVEL = $(echo ${pkgver} | cut -d. -f3)/g" "../0001-BFQ-${_bfq}-${_bfqdate}-mjr.patch"
 
   msg "add upstream patch"
@@ -131,7 +131,7 @@ prepare() {
 
   msg2 "0513-bootsplash"
   git apply -p1 < "../0513-bootsplash.gitpatch"
-  
+
   cat "../config" > ./.config
 
   cat "../config.aufs" >> ./.config
@@ -191,7 +191,7 @@ package_linux419() {
   rm "${pkgdir}"/usr/lib/modules/${_kernver}/{source,build}
 
   # now we call depmod...
-  depmod -b "${pkgdir}/usr" -F System.map "${_kernver}"
+  depmod -b "${pkgdir}" -F System.map "${_kernver}"
 }
 
 package_linux419-headers() {
