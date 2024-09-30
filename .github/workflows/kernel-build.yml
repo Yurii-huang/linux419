@@ -1,10 +1,356 @@
 name: kernel_build
 
-on:
-  push:
+on: push
 
 jobs:
   build-kernel:
     runs-on: ubuntu-20.04
     steps:
-      - uses: manjaro-kernels/kernel-action@master
+      - id: install_build-dependencies
+        shell: bash
+        run: |
+          sudo apt-get update
+          sudo apt-get install \
+          build-essential \
+          cmake \
+          fakeroot \
+          git \
+          libarchive-dev \
+          libarchive-tools \
+          libcurl4-openssl-dev \
+          libgpgme-dev \
+          libssl-dev \
+          zip \
+          python3-pip
+          sudo pip3 install meson
+          sudo pip3 install ninja
+      - id: install_pacman
+        shell: bash
+        env:
+          PACMAN_VERSION: 6.0.2
+        run: |
+          sudo git clone --depth 1 https://gitlab.manjaro.org/packages/core/pacman.git
+          pushd pacman
+          sudo wget https://sources.archlinux.org/other/pacman/pacman-${PACMAN_VERSION}.tar.xz
+          sudo tar -xvf pacman-${PACMAN_VERSION}.tar.xz
+          pushd pacman-${PACMAN_VERSION}
+          ## sudo patch -p1 -i ../pacman-sync-first-option.patch
+          sudo meson --prefix=/usr \
+                      --buildtype=plain \
+                      -Ddoc=disabled \
+                      -Ddoxygen=enabled \
+                      -Dscriptlet-shell=/usr/bin/bash \
+                      -Dldconfig=/usr/bin/ldconfig \
+                      build
+          sudo meson compile -C build
+          sudo meson install -C build
+          popd
+          sudo install -m644 pacman.conf /etc/pacman.conf
+          sudo install -m644 makepkg.conf /etc/
+          sudo mkdir -p /etc/pacman.d
+          echo "Server = ${{ inputs.build-mirror }}/${{ inputs.branch }}/\$repo/\$arch" | sudo tee /etc/pacman.d/mirrorlist
+          # install updpkgsums
+          sudo wget https://gitlab.archlinux.org/pacman/pacman-contrib/-/raw/master/src/updpkgsums.sh.in
+          sudo wget https://gitlab.archlinux.org/pacman/pacman-contrib/-/raw/master/configure.ac
+          contrib_ver=$(grep AC_INIT configure.ac | cut -d[ -f3 | cut -d] -f1)
+          sudo sed -i -e "s/@PACKAGE_VERSION@/${contrib_ver}/; s/@libmakepkgdir@/\/usr\/share\/makepkg/" updpkgsums.sh.in
+          sudo install -m755 updpkgsums.sh.in /usr/bin/updpkgsums
+          popd
+          sudo rm -rf pacman-${PACMAN_VERSION}
+      - id: install_keyrings
+        shell: bash
+        run: |
+          sudo install -dm755 /usr/share/pacman/keyrings/
+
+          sudo git clone --depth 1 https://gitlab.manjaro.org/packages/core/manjaro-keyring.git
+          pushd manjaro-keyring
+            sudo install -m0644 manjaro.gpg /usr/share/pacman/keyrings/
+            sudo install -m0644 manjaro-trusted /usr/share/pacman/keyrings/
+            sudo install -m0644 manjaro-trusted /usr/share/pacman/keyrings/
+          popd
+          sudo rm -rf manjaro-keyring
+
+          mkdir -p archlinux-keyring
+          pushd archlinux-keyring
+            wget https://archlinux.org/packages/core/any/archlinux-keyring/download -O /tmp/archlinux-keyring.tar.zst
+            tar --use-compress-program=unzstd --strip-components=4 --wildcards -xvf /tmp/archlinux-keyring.tar.zst usr/share/pacman/keyrings/*
+            sudo install -m0644 archlinux.gpg /usr/share/pacman/keyrings/
+            sudo install -m0644 archlinux-trusted /usr/share/pacman/keyrings/
+            sudo install -m0644 archlinux-revoked /usr/share/pacman/keyrings/
+          popd
+          sudo pacman-key --init
+          sudo pacman-key --populate archlinux manjaro
+          sudo rm -rf archlinux-keyring
+      - id: cleanup_space_workaround
+        shell: bash
+        run: |
+          sudo apt-get clean
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /opt/ghc
+          sudo rm -rf "/usr/local/share/boost"
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+      - id: install_manjaro-chrootbuild
+        shell: bash
+        run: |
+          sudo git clone --depth 1 https://gitlab.manjaro.org/tools/development-tools/manjaro-chrootbuild
+          pushd manjaro-chrootbuild
+          sudo ./install.sh
+          echo 'PACKAGER="Manjaro Build Server <build@manjaro.org>"' | sudo tee -a /etc/makepkg.conf > /dev/null
+          popd
+          sudo rm -rf manjaro-chrootbuild
+      - id: clone_repo
+        shell: bash
+        run: |
+          KERNEL=$(echo ${GITHUB_REPOSITORY} | cut -d'/' -f2)
+          sudo git clone https://mjr-build-server:${{ inputs.gitlab-pw }}@gitlab.manjaro.org/packages/core/${KERNEL}.git
+          sudo git config --global user.name "Manjaro Build Server"
+          sudo git config --global user.email "build@manjaro.org"
+          echo "KERNEL=${KERNEL}" >>$GITHUB_ENV
+          if [[ "${{ inputs.bump-kernel }}" == "true" ]]; then
+            oldver=$(grep 'pkgver=' ${KERNEL}/PKGBUILD | cut -d'=' -f2)
+            sudo chown -R ${UID}:${UID} ${KERNEL}
+            cd ${KERNEL}
+            if [[ $oldver == *rc* ]]; then
+              ver_maj=$(echo $oldver | cut -d'r' -f1)
+              _rc=$(echo ${oldver} | cut -d'c' -f2)
+              _rc_new=rc$((${_rc}+1))
+              sudo sed -i -e "/^_rc=/c\_rc=${_rc_new}" PKGBUILD
+              ver_new=${ver_maj}${_rc_new}
+            else
+              ver_maj=$(printf "%s.%s" "$(echo ${oldver} | cut -d. -f1)" "$(echo ${oldver} | cut -d. -f2)")
+              ver_min=$(echo ${oldver} | cut -d. -f3)
+              ver_new=${ver_maj}.$((${ver_min}+1))
+            fi
+              sudo sed -i -e "/^pkgver=/c\pkgver=${ver_new}" PKGBUILD
+              sudo sed -i -e "/^pkgrel=/c\pkgrel=1" PKGBUILD
+              echo "update PKGBUILD"
+              updpkgsums
+              sudo git add PKGBUILD
+              sudo git commit -m"[pkg-upd] ${ver_new}-1"
+              sudo git push
+              sudo rm -rf src
+              cd ..
+          elif [[ "${{ inputs.bump-pkgrel }}" == "true" ]]; then
+            repover=$(sudo pacman -Syi ${KERNEL} | grep Version | rev | cut -d' ' -f1 | rev | cut -d- -f1)
+            . ${KERNEL}/PKGBUILD
+            if [[ "$pkgver" == "$repover" ]]; then
+              sudo chown -R ${UID}:${UID} ${KERNEL}
+              cd ${KERNEL}
+              reporel=$(sudo pacman -Syi ${KERNEL} | grep Version | cut -d'-' -f2)
+              rel_new=$((${reporel}+1))
+              sudo sed -i -e "/^pkgrel=/c\pkgrel=${rel_new}" PKGBUILD
+              sudo git add PKGBUILD
+              sudo git commit -m"[pkg-upd] pkgrel ${rel_new}"
+              sudo git push
+              cd ..
+            fi
+          fi
+      - name: build_kernel
+        shell: bash
+        run: |
+          sudo chrootbuild -p ${{ env.KERNEL }} -b ${{ inputs.branch }}
+          if [ -z "${{ inputs.gpg-key }}" ] || [ -z "${{ inputs.gpg-passphrase }}" ]; then
+            echo "## gpg credentials not provided. Skip signing."
+          else
+            cat <(echo -e "${{ inputs.gpg-key }}" | base64 --decode) | gpg --batch --import &>/dev/null
+            for p in $(find $PWD -maxdepth 1 -regex '.*\.pkg\.tar\.\(xz\|zst\)'); do
+              echo "## signing $p"
+              gpg --pinentry-mode loopback --passphrase "${{ inputs.gpg-passphrase }}" --detach-sign ${p}
+            done
+          fi
+          CHRSRC=/var/lib/chrootbuild/build/${{ env.KERNEL }}
+          echo "CHRSRC=${CHRSRC}" >> $GITHUB_ENV
+          . ${CHRSRC}/PKGBUILD
+          if [[ ! -z ${_rc} ]]; then
+              _confpath=${CHRSRC}/src/linux-${_basekernel}-${_rc}
+          else
+              _confpath=${CHRSRC}/src/linux-${_basekernel}
+          fi
+          if [[ "${{ inputs.bump-kernel }}" == "true" ]]; then
+              cd ${{ env.KERNEL }}
+              if [[ -e config.rt ]]; then
+                  sudo rm config.rt
+                  sudo cp "${_confpath}/.config" config.rt
+              else
+                  sudo rm config
+                  sudo cp "${_confpath}/.config" config
+              fi
+              if [[ -e config.rt ]]; then
+                  sudo git add config.rt
+              else
+                  sudo git add config
+              fi
+              updpkgsums
+              sudo git add PKGBUILD
+              sudo git commit -m"update config" || true
+              sudo git push
+              sudo rm -rf .git
+              cd ..
+          fi
+      - id: publish_kernel
+        shell: bash -O extglob {0}
+        run: |
+          _chrpkb=${{ env.CHRSRC }}/PKGBUILD
+          _ver=$(grep ^pkgver= ${_chrpkb} | cut -d'=' -f2)
+          _rel=$(grep ^pkgrel= ${_chrpkb} | cut -d'=' -f2)
+          _tag=${_ver}-${_rel}
+          sudo zip linux-${_tag}.zip ./*.zst ./*sig
+          echo ${{ github.token }} | gh auth login --with-token
+          gh release create ${_tag} --title ${_tag} --repo ${{ github.repository }} --notes "automated release" || echo "release already exists"
+          GITHUB_LINK=https://github.com/${GITHUB_REPOSITORY}/releases/download/${_tag}
+          gh release upload ${_tag} --repo ${GITHUB_REPOSITORY} --clobber ./linux-${_tag}.zip
+          echo "TAG=${_tag}" >>$GITHUB_ENV
+          echo "GITHUB_LINK=${GITHUB_LINK}" >>$GITHUB_ENV
+          sudo rm -rf /var/lib/chrootbuild
+      - name: get modules
+        shell: bash
+        run: |
+          sudo cp ${{ env.KERNEL }}/modules.list .
+          sudo sed -i -e '/^#/d' modules.list
+          sudo mkdir modules
+          pushd modules
+          for m in $(cat ../modules.list); do
+            sudo git clone "https://mjr-build-server:${{ inputs.gitlab-pw }}@gitlab.manjaro.org/packages/extra/${{ env.KERNEL }}-extramodules/$m.git"
+            if [[ ! "${{ inputs.bump-modules }}" == "none" ]]; then
+              _m=$m
+              [[ $m == "spl_zfs" ]] && _m=zfs
+              [[ $m == "virtualbox-modules" ]] || [[ $m == "virtualbox" ]] && _m=virtualbox-host-modules
+              cd $m
+              repover=$(sudo pacman -Syi ${{ env.KERNEL }}-$_m | grep Version | rev | cut -d' ' -f1 | rev) || true
+              if [[ ! -z "$repover" ]]; then
+                _reporel=$(echo $repover | cut -d- -f2)
+                _gitrel=$(grep "^pkgrel=" PKGBUILD | cut -d= -f2)
+                if [[ "${{ inputs.bump-modules }}" == "git" ]]; then
+                  _rel=$_gitrel
+                elif [[ "${{ inputs.bump-modules }}" == "repo" ]]; then
+                  _rel=$_reporel
+                fi
+                if [[ $_rel == 0.* ]]; then
+                  if [[ ! ${{ env.TAG }} == *rc* ]]; then
+                    _newrel=1
+                  else
+                    _rel=${_rel#*.}
+                    _newrel=0.$((${_rel}+1))
+                  fi
+                else
+                  _newrel=$((${_rel}+1))
+                fi
+                _ver=$(echo $repover | cut -d- -f1)
+                _gitver=$(grep ^pkgver= PKGBUILD | cut -d= -f2)
+                ## [[ $(vercmp $_gitver $_ver) == 1 ]] && _newrel=1
+                sudo sed -i -e "/^pkgrel=/c\pkgrel=$_newrel" PKGBUILD
+                if [[ "$_newrel" != "$_gitrel" ]]; then
+                  sudo git add PKGBUILD
+                  sudo git commit -m"${_gitver}-$(grep "^pkgrel=" PKGBUILD | cut -d= -f2)"
+                  sudo git push
+                  sudo rm -rf .git
+                fi
+              else
+                echo "$m doesn't exist yet in repo. Attempting initial build."
+              fi
+              cd ..
+            fi
+          done
+          popd
+      - id: build_modules
+        shell: bash
+        run: |
+          sudo chrootbuild -K modules -i "${{ env.KERNEL }}-${{ env.TAG }}*.zst" -i "${{ env.KERNEL }}-headers*.zst" -b ${{ inputs.branch }}
+          sudo rm ./${{ env.KERNEL }}-${{ env.TAG }}-x86_64.pkg.tar.zst{,.sig} ./${{ env.KERNEL }}-headers-${{ env.TAG }}-x86_64.pkg.tar.zst{,.sig}
+          if [ -z "${{ inputs.gpg-key }}" ] || [ -z "${{ inputs.gpg-passphrase }}" ]; then
+            echo "## gpg credentials not provided. Skip signing."
+          else
+            for p in $(find $PWD -maxdepth 1 -regex '.*\.pkg\.tar\.\(xz\|zst\)'); do
+              echo "## signing $p"
+              gpg --pinentry-mode loopback --passphrase "${{ inputs.gpg-passphrase }}" --detach-sign ${p}
+            done
+          fi
+      - id: publish_logs
+        shell: bash -O extglob {0}
+        run: |
+          pushd /home/runner/.chrootbuild-logs
+          sudo zip "linux-${{ env.TAG }}-logs.zip" ./*
+          echo ${{ github.token }} | gh auth login --with-token
+          GITHUB_LINK=${{ env.GITHUB_LINK }}
+          gh release upload ${{ env.TAG }} --repo ${GITHUB_REPOSITORY} --clobber ./linux-${{ env.TAG }}-logs.zip # ./*.tar
+          popd
+      - id: publish_modules
+        shell: bash -O extglob {0}
+        run: |
+          sudo zip "linux-${{ env.TAG }}-extramodules.zip" ./*.zst ./*.sig
+          echo ${{ github.token }} | gh auth login --with-token
+          GITHUB_LINK=${{ env.GITHUB_LINK }}
+          gh release upload ${{ env.TAG }} --repo ${GITHUB_REPOSITORY} --clobber ./linux-${{ env.TAG }}-extramodules.zip # ./*.tar
+      - id: deploy_bxt
+        shell: bash -O extglob {0}
+        run: |
+          if [[ -z "${{ inputs.bxt-api-key }}" ]]; then
+            echo "## no bxt-API-key provided. unable to deploy."
+            exit 0
+          fi
+          if [[ ! -f /home/runner/.chrootbuild-logs/err_list ]]; then
+            # Server URL
+            BASE_URL="https://bxt.staging.manjaro.org/api/deploy"
+            # API key for authentication
+            API_KEY="${{ inputs.bxt-api-key }}"
+
+            # Start the deployment and get a session ID
+            echo "Starting deployment..."
+            SESSION_ID=$(curl -s -X POST "$BASE_URL/start" -H "key: $API_KEY" -H "job-url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}")
+            if [ -z "$SESSION_ID" ]; then
+              echo "Failed to obtain a session ID."
+              exit 1
+            fi
+            echo "Session ID: $SESSION_ID"
+
+            # Function to push a package
+            push_package() {
+              local FILE_PATH="$1"
+              local BRANCH="$2"
+              local REPOSITORY="$3"
+              local ARCHITECTURE="$4"
+
+              echo "Pushing package: $FILE_PATH..."
+
+              # Push the package
+              PUSH_RESPONSE=$(curl -s -X POST "$BASE_URL/push" \
+                -H "session: $SESSION_ID" \
+                -H "key: $API_KEY" \
+                -F "branch=$BRANCH" \
+                -F "repository=$REPOSITORY" \
+                -F "architecture=$ARCHITECTURE" \
+                -F "file=@$FILE_PATH" \
+                -F "signature=@$FILE_PATH.sig")
+
+              # Check for errors in the response
+              if [[ "$PUSH_RESPONSE" != *"ok"* ]]; then
+                echo "Error pushing package: $FILE_PATH"
+                echo "Error message: $PUSH_RESPONSE"
+                return 1
+              fi
+
+              echo "Package pushed: $FILE_PATH"
+            }
+
+            # Push modules
+            for m in $(ls ./*.zst); do
+              push_package "${m}" "${{ inputs.branch }}" "extra" "x86_64"
+            done
+            mkdir kernel
+            unzip linux-${{ env.TAG }}.zip -d kernel
+            # Push kernel
+            for k in $(ls kernel/*.zst); do
+              push_package "${k}" "${{ inputs.branch }}" "core" "x86_64"
+            done
+
+            # Finish the deployment transaction
+            echo "Finishing deployment..."
+            END_RESPONSE=$(curl -s -X POST "$BASE_URL/end" -H "session: $SESSION_ID" -H "key: $API_KEY")
+
+            # Check the response for success
+            if [[ "$END_RESPONSE" == *"ok"* ]]; then
+              echo "Deployment completed successfully."
+            else
+              echo $END_RESPONSE
+            fi
+          fi
