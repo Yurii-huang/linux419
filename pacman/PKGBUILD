@@ -34,7 +34,7 @@ options=('!strip')
 source=("git+file://${PWD}")
 sha256sums=()
 prepare() {
-  # cd "linux-${_basekernel}"
+  cd "linux-${_basever}"
 
   cat "../config" > ./.config
 
@@ -60,7 +60,7 @@ prepare() {
 }
 
 build() {
-  # cd "linux-${_basekernel}"
+  cd "linux-${_basever}"
 
   msg "build"
   make ${MAKEFLAGS} LOCALVERSION= bzImage modules
@@ -72,7 +72,7 @@ package_linux419() {
   optdepends=('wireless-regdb: to set the correct wireless channels of your country')
   provides=("linux=${pkgver}" VIRTUALBOX-GUEST-MODULES)
 
-  # cd "linux-${_basekernel}"
+  cd "linux-${_basekernel}"
 
   # get kernel version
   _kernver="$(make LOCALVERSION= kernelrelease)"
@@ -103,7 +103,7 @@ package_linux419-headers() {
   depends=('gawk' 'python' 'libelf' 'pahole')
   provides=("linux-headers=$pkgver")
 
-  # cd "linux-${_basekernel}"
+  cd "linux-${_basever}"
   local _builddir="${pkgdir}/usr/lib/modules/${_kernver}/build"
 
   # add real version for building modules and running depmod from hook
