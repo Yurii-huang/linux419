@@ -11,245 +11,273 @@ env:
 on:
   push:
 
-  workflow_dispatch:
-    inputs:
-      gitlab-pw:
-        description: 'gitlab password'
-        required: true
-        type: string
-      build-mirror:
-        description: 'pacman-mirror to be used by manjaro-chrootbuild'
-        required: false
-        default: 'https://mirrors.manjaro.org/repo'
-        type: string
-      branch:
-        description: 'branch to build against'
-        required: false
-        default: "unstable"
-        type: string
-      bump-kernel:
-        description: 'get kernel repo version and build higher dot release'
-        required: false
-        default: false
-        type: boolean
-      bump-pkgrel:
-        description: 'get kernel repo pkgrel and bump'
-        required: false
-        default: false
-        type: boolean
-      bump-modules:
-        description: 'bump modules pkgrel in PKGBUILD. Possible values: git, repo, none'
-        required: false
-        default: "none"
-        type: string
-      realtime:
-        description: 'is realtime-kernel'
-        required: false
-        default: false
-        type: boolean
-      gpg-key:
-        description: 'base64 encoded gpg secret key'
-        required: true
-        type: boolean
-      gpg-passphrase:
-        description: 'passphrase for gpg key'
-        required: true
-        type: boolean
-      bxt-api-key:
-        description: 'bxt api key'
-        required: false
-        type: boolean
+  # workflow_dispatch:
+  #   inputs:
+  #     gitlab-pw:
+  #       description: 'gitlab password'
+  #       required: true
+  #       type: string
+  #     build-mirror:
+  #       description: 'pacman-mirror to be used by manjaro-chrootbuild'
+  #       required: false
+  #       default: 'https://mirrors.manjaro.org/repo'
+  #       type: string
+  #     branch:
+  #       description: 'branch to build against'
+  #       required: false
+  #       default: "unstable"
+  #       type: string
+  #     bump-kernel:
+  #       description: 'get kernel repo version and build higher dot release'
+  #       required: false
+  #       default: false
+  #       type: boolean
+  #     bump-pkgrel:
+  #       description: 'get kernel repo pkgrel and bump'
+  #       required: false
+  #       default: false
+  #       type: boolean
+  #     bump-modules:
+  #       description: 'bump modules pkgrel in PKGBUILD. Possible values: git, repo, none'
+  #       required: false
+  #       default: "none"
+  #       type: string
+  #     realtime:
+  #       description: 'is realtime-kernel'
+  #       required: false
+  #       default: false
+  #       type: boolean
+  #     gpg-key:
+  #       description: 'base64 encoded gpg secret key'
+  #       required: true
+  #       type: boolean
+  #     gpg-passphrase:
+  #       description: 'passphrase for gpg key'
+  #       required: true
+  #       type: boolean
+  #     bxt-api-key:
+  #       description: 'bxt api key'
+  #       required: false
+  #       type: boolean
 
 jobs:
   build-kernel:
     runs-on: ubuntu-20.04
+    container: archlinux
     steps:
-      - id: install_build-dependencies
+      - name: install_build-dependencies
         shell: bash
         run: |
-          sudo apt-get update
-          sudo apt-get install \
-          build-essential \
-          cmake \
-          fakeroot \
-          git \
-          libarchive-dev \
-          libarchive-tools \
-          libcurl4-openssl-dev \
-          libgpgme-dev \
-          libssl-dev \
-          zip \
-          python3-pip
-          sudo pip3 install meson
-          sudo pip3 install ninja
-      - id: install_pacman
-        shell: bash
-        env:
-          PACMAN_VERSION: 6.0.2
-        run: |
-          sudo git clone --depth 1 https://gitlab.manjaro.org/packages/core/pacman.git
-          pushd pacman
-          sudo wget https://sources.archlinux.org/other/pacman/pacman-${PACMAN_VERSION}.tar.xz
-          sudo tar -xvf pacman-${PACMAN_VERSION}.tar.xz
-          pushd pacman-${PACMAN_VERSION}
-          ## sudo patch -p1 -i ../pacman-sync-first-option.patch
-          sudo meson --prefix=/usr \
-                      --buildtype=plain \
-                      -Ddoc=disabled \
-                      -Ddoxygen=enabled \
-                      -Dscriptlet-shell=/usr/bin/bash \
-                      -Dldconfig=/usr/bin/ldconfig \
-                      build
-          sudo meson compile -C build
-          sudo meson install -C build
-          popd
-          sudo install -m644 pacman.conf /etc/pacman.conf
-          sudo install -m644 makepkg.conf /etc/
-          sudo mkdir -p /etc/pacman.d
-          echo "Server = ${{ env.build-mirror }}/${{ env.branch }}/\$repo/\$arch" | sudo tee /etc/pacman.d/mirrorlist
-          # install updpkgsums
-          sudo wget https://gitlab.archlinux.org/pacman/pacman-contrib/-/raw/master/src/updpkgsums.sh.in
-          sudo wget https://gitlab.archlinux.org/pacman/pacman-contrib/-/raw/master/configure.ac
-          contrib_ver=$(grep AC_INIT configure.ac | cut -d[ -f3 | cut -d] -f1)
-          sudo sed -i -e "s/@PACKAGE_VERSION@/${contrib_ver}/; s/@libmakepkgdir@/\/usr\/share\/makepkg/" updpkgsums.sh.in
-          sudo install -m755 updpkgsums.sh.in /usr/bin/updpkgsums
-          popd
-          sudo rm -rf pacman-${PACMAN_VERSION}
-      - id: install_keyrings
+          echo "Y"| pacman -Sy git devtools
+      - name: clone_repos
         shell: bash
         run: |
-          sudo install -dm755 /usr/share/pacman/keyrings/
-
-          sudo git clone --depth 1 https://gitlab.manjaro.org/packages/core/manjaro-keyring.git
-          pushd manjaro-keyring
-            sudo install -m0644 manjaro.gpg /usr/share/pacman/keyrings/
-            sudo install -m0644 manjaro-trusted /usr/share/pacman/keyrings/
-            sudo install -m0644 manjaro-trusted /usr/share/pacman/keyrings/
-          popd
-          sudo rm -rf manjaro-keyring
-
-          mkdir -p archlinux-keyring
-          pushd archlinux-keyring
-            wget https://archlinux.org/packages/core/any/archlinux-keyring/download -O /tmp/archlinux-keyring.tar.zst
-            tar --use-compress-program=unzstd --strip-components=4 --wildcards -xvf /tmp/archlinux-keyring.tar.zst usr/share/pacman/keyrings/*
-            sudo install -m0644 archlinux.gpg /usr/share/pacman/keyrings/
-            sudo install -m0644 archlinux-trusted /usr/share/pacman/keyrings/
-            sudo install -m0644 archlinux-revoked /usr/share/pacman/keyrings/
-          popd
-          sudo pacman-key --init
-          sudo pacman-key --populate archlinux manjaro
-          sudo rm -rf archlinux-keyring
-      - id: cleanup_space_workaround
-        shell: bash
-        run: |
-          sudo apt-get clean
-          sudo rm -rf /usr/share/dotnet
-          sudo rm -rf /opt/ghc
-          sudo rm -rf "/usr/local/share/boost"
-          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
-      - id: install_manjaro-chrootbuild
-        shell: bash
-        run: |
-          sudo git clone --depth 1 https://gitlab.manjaro.org/tools/development-tools/manjaro-chrootbuild
-          pushd manjaro-chrootbuild
-          sudo ./install.sh
-          echo 'PACKAGER="Manjaro Build Server <build@manjaro.org>"' | sudo tee -a /etc/makepkg.conf > /dev/null
-          popd
-          sudo rm -rf manjaro-chrootbuild
-      - id: clone_repo
-        shell: bash
-        run: |
-          KERNEL=$(echo ${GITHUB_REPOSITORY} | cut -d'/' -f2)
+          KERNEL=$(echo ${{ github.repository }} | cut -d'/' -f2)
           GITHUB_BRANCH=$(echo ${{ github.ref }}| cut -d'/' -f3)
-          sudo git clone https://github.com/${{ github.repository }}.git -b ${GITHUB_BRANCH}
-          sudo git config --global user.name "Manjaro Build Server"
-          sudo git config --global user.email "build@manjaro.org"
           echo "KERNEL=${KERNEL}" >>$GITHUB_ENV
-          if [[ "${{ env.bump-kernel }}" == "true" ]]; then
-            oldver=$(grep 'pkgver=' ${KERNEL}/PKGBUILD | cut -d'=' -f2)
-            sudo chown -R ${UID}:${UID} ${KERNEL}
-            # cd ${KERNEL}
-            if [[ $oldver == *rc* ]]; then
-              ver_maj=$(echo $oldver | cut -d'r' -f1)
-              _rc=$(echo ${oldver} | cut -d'c' -f2)
-              _rc_new=rc$((${_rc}+1))
-              sudo sed -i -e "/^_rc=/c\_rc=${_rc_new}" PKGBUILD
-              ver_new=${ver_maj}${_rc_new}
-            else
-              ver_maj=$(printf "%s.%s" "$(echo ${oldver} | cut -d. -f1)" "$(echo ${oldver} | cut -d. -f2)")
-              ver_min=$(echo ${oldver} | cut -d. -f3)
-              ver_new=${ver_maj}.$((${ver_min}+1))
-            fi
-              sudo sed -i -e "/^pkgver=/c\pkgver=${ver_new}" PKGBUILD
-              sudo sed -i -e "/^pkgrel=/c\pkgrel=1" PKGBUILD
-              echo "update PKGBUILD"
-              updpkgsums
-              sudo git add PKGBUILD
-              sudo git commit -m"[pkg-upd] ${ver_new}-1"
-              sudo git push
-              sudo rm -rf src
-              # cd ..
-          elif [[ "${{ env.bump-pkgrel }}" == "true" ]]; then
-            repover=$(sudo pacman -Syi ${KERNEL} | grep Version | rev | cut -d' ' -f1 | rev | cut -d- -f1)
-            . ${KERNEL}/PKGBUILD
-            if [[ "$pkgver" == "$repover" ]]; then
-              sudo chown -R ${UID}:${UID} ${KERNEL}
-              cd ${KERNEL}
-              reporel=$(sudo pacman -Syi ${KERNEL} | grep Version | cut -d'-' -f2)
-              rel_new=$((${reporel}+1))
-              sudo sed -i -e "/^pkgrel=/c\pkgrel=${rel_new}" PKGBUILD
-              sudo git add PKGBUILD
-              sudo git commit -m"[pkg-upd] pkgrel ${rel_new}"
-              sudo git push
-              cd ..
-            fi
-          fi
+          useradd calong -m
+          usermod -a -G root calong
+          su calong
+          echo $HOME
+          su calong -c "git clone https://github.com/${{ github.repository }}.git -b ${GITHUB_BRANCH}"
+          su calong -c "cp -arpf ${KERNEL}/pacman/* ${KERNEL}/"
       - name: build_kernel
         shell: bash
         run: |
-          sudo cp -arpf ${{ env.KERNEL }}/pacman/* ${{ env.KERNEL }}
-          ls -al ${{ env.KERNEL }}
-          # sed -i 's/==GIT_FILE==/${{ github.workspace }}\/${{ env.KERNEL }}/g' ${{ env.KERNEL }}/PKGBUILD
-          sudo chrootbuild -p ${{ env.KERNEL }} -b ${{ env.branch }}
-          if [ -z "${{ env.gpg-key }}" ] || [ -z "${{ env.gpg-passphrase }}" ]; then
-            echo "## gpg credentials not provided. Skip signing."
-          else
-            cat <(echo -e "${{ env.gpg-key }}" | base64 --decode) | gpg --batch --import &>/dev/null
-            for p in $(find $PWD -maxdepth 1 -regex '.*\.pkg\.tar\.\(xz\|zst\)'); do
-              echo "## signing $p"
-              gpg --pinentry-mode loopback --passphrase "${{ env.gpg-passphrase }}" --detach-sign ${p}
-            done
-          fi
-          CHRSRC=/var/lib/chrootbuild/build/${{ env.KERNEL }}
-          echo "CHRSRC=${CHRSRC}" >> $GITHUB_ENV
-          . ${CHRSRC}/PKGBUILD
-          if [[ ! -z ${_rc} ]]; then
-              _confpath=${CHRSRC}/src/linux-${_basekernel}-${_rc}
-          else
-              _confpath=${CHRSRC}/src/linux-${_basekernel}
-          fi
-          if [[ "${{ env.bump-kernel }}" == "true" ]]; then
-              cd ${{ env.KERNEL }}
-              if [[ -e config.rt ]]; then
-                  sudo rm config.rt
-                  sudo cp "${_confpath}/.config" config.rt
-              else
-                  sudo rm config
-                  sudo cp "${_confpath}/.config" config
-              fi
-              if [[ -e config.rt ]]; then
-                  sudo git add config.rt
-              else
-                  sudo git add config
-              fi
-              updpkgsums
-              sudo git add PKGBUILD
-              sudo git commit -m"update config" || true
-              sudo git push
-              sudo rm -rf .git
-              cd ..
-          fi
-      # - id: publish_kernel
+          su calong -c "makepkg ${{ env.KERNEL }}/PKGBUILD"
+          
+      #   run: |
+      #     sudo apt-get update
+      #     sudo apt-get install \
+      #     build-essential \
+      #     cmake \
+      #     fakeroot \
+      #     git \
+      #     libarchive-dev \
+      #     libarchive-tools \
+      #     libcurl4-openssl-dev \
+      #     libgpgme-dev \
+      #     libssl-dev \
+      #     zip \
+      #     python3-pip
+      #     sudo pip3 install meson
+      #     sudo pip3 install ninja
+      # - name: install_pacman
+      #   shell: bash
+      #   env:
+      #     PACMAN_VERSION: 6.0.2
+      #   run: |
+      #     sudo git clone --depth 1 https://gitlab.manjaro.org/packages/core/pacman.git
+      #     pushd pacman
+      #     sudo wget https://sources.archlinux.org/other/pacman/pacman-${PACMAN_VERSION}.tar.xz
+      #     sudo tar -xvf pacman-${PACMAN_VERSION}.tar.xz
+      #     pushd pacman-${PACMAN_VERSION}
+      #     ## sudo patch -p1 -i ../pacman-sync-first-option.patch
+      #     sudo meson --prefix=/usr \
+      #                 --buildtype=plain \
+      #                 -Ddoc=disabled \
+      #                 -Ddoxygen=enabled \
+      #                 -Dscriptlet-shell=/usr/bin/bash \
+      #                 -Dldconfig=/usr/bin/ldconfig \
+      #                 build
+      #     sudo meson compile -C build
+      #     sudo meson install -C build
+      #     popd
+      #     sudo install -m644 pacman.conf /etc/pacman.conf
+      #     sudo install -m644 makepkg.conf /etc/
+      #     sudo mkdir -p /etc/pacman.d
+      #     echo "Server = ${{ env.build-mirror }}/${{ env.branch }}/\$repo/\$arch" | sudo tee /etc/pacman.d/mirrorlist
+      #     # install updpkgsums
+      #     sudo wget https://gitlab.archlinux.org/pacman/pacman-contrib/-/raw/master/src/updpkgsums.sh.in
+      #     sudo wget https://gitlab.archlinux.org/pacman/pacman-contrib/-/raw/master/configure.ac
+      #     contrib_ver=$(grep AC_INIT configure.ac | cut -d[ -f3 | cut -d] -f1)
+      #     sudo sed -i -e "s/@PACKAGE_VERSION@/${contrib_ver}/; s/@libmakepkgdir@/\/usr\/share\/makepkg/" updpkgsums.sh.in
+      #     sudo install -m755 updpkgsums.sh.in /usr/bin/updpkgsums
+      #     popd
+      #     sudo rm -rf pacman-${PACMAN_VERSION}
+      # - name: install_rootfs
+      #   shell: bash
+      #   run: |
+      #       pacman -Sl|grep mkarchroot
+      #       pacman -S mkarchroot
+      #       mkdir ~/chroot
+      #       CHROOT=$HOME/chroot
+      #       mkarchroot $CHROOT/root base-devel
+
+      # - name: install_keyrings
+      #   shell: bash
+      #   run: |
+      #     sudo install -dm755 /usr/share/pacman/keyrings/
+
+      #     sudo git clone --depth 1 https://gitlab.manjaro.org/packages/core/manjaro-keyring.git
+      #     pushd manjaro-keyring
+      #       sudo install -m0644 manjaro.gpg /usr/share/pacman/keyrings/
+      #       sudo install -m0644 manjaro-trusted /usr/share/pacman/keyrings/
+      #       sudo install -m0644 manjaro-trusted /usr/share/pacman/keyrings/
+      #     popd
+      #     sudo rm -rf manjaro-keyring
+
+      #     mkdir -p archlinux-keyring
+      #     pushd archlinux-keyring
+      #       wget https://archlinux.org/packages/core/any/archlinux-keyring/download -O /tmp/archlinux-keyring.tar.zst
+      #       tar --use-compress-program=unzstd --strip-components=4 --wildcards -xvf /tmp/archlinux-keyring.tar.zst usr/share/pacman/keyrings/*
+      #       sudo install -m0644 archlinux.gpg /usr/share/pacman/keyrings/
+      #       sudo install -m0644 archlinux-trusted /usr/share/pacman/keyrings/
+      #       sudo install -m0644 archlinux-revoked /usr/share/pacman/keyrings/
+      #     popd
+      #     sudo pacman-key --init
+      #     sudo pacman-key --populate archlinux manjaro
+      #     sudo rm -rf archlinux-keyring
+      # - name: cleanup_space_workaround
+      #   shell: bash
+      #   run: |
+      #     sudo apt-get clean
+      #     sudo rm -rf /usr/share/dotnet
+      #     sudo rm -rf /opt/ghc
+      #     sudo rm -rf "/usr/local/share/boost"
+      #     sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+      # - name: install_manjaro-chrootbuild
+      #   shell: bash
+      #   run: |
+      #     sudo git clone --depth 1 https://gitlab.manjaro.org/tools/development-tools/manjaro-chrootbuild
+      #     pushd manjaro-chrootbuild
+      #     sudo ./install.sh
+      #     echo 'PACKAGER="Manjaro Build Server <build@manjaro.org>"' | sudo tee -a /etc/makepkg.conf > /dev/null
+      #     popd
+      #     sudo rm -rf manjaro-chrootbuild
+      # - name: clone_repo
+      #   shell: bash
+      #   run: |
+      #     KERNEL=$(echo ${GITHUB_REPOSITORY} | cut -d'/' -f2)
+      #     GITHUB_BRANCH=$(echo ${{ github.ref }}| cut -d'/' -f3)
+      #     sudo git clone https://github.com/${{ github.repository }}.git -b ${GITHUB_BRANCH}
+      #     sudo git config --global user.name "Manjaro Build Server"
+      #     sudo git config --global user.email "build@manjaro.org"
+      #     echo "KERNEL=${KERNEL}" >>$GITHUB_ENV
+      #     if [[ "${{ env.bump-kernel }}" == "true" ]]; then
+      #       oldver=$(grep 'pkgver=' ${KERNEL}/PKGBUILD | cut -d'=' -f2)
+      #       sudo chown -R ${UID}:${UID} ${KERNEL}
+      #       # cd ${KERNEL}
+      #       if [[ $oldver == *rc* ]]; then
+      #         ver_maj=$(echo $oldver | cut -d'r' -f1)
+      #         _rc=$(echo ${oldver} | cut -d'c' -f2)
+      #         _rc_new=rc$((${_rc}+1))
+      #         sudo sed -i -e "/^_rc=/c\_rc=${_rc_new}" PKGBUILD
+      #         ver_new=${ver_maj}${_rc_new}
+      #       else
+      #         ver_maj=$(printf "%s.%s" "$(echo ${oldver} | cut -d. -f1)" "$(echo ${oldver} | cut -d. -f2)")
+      #         ver_min=$(echo ${oldver} | cut -d. -f3)
+      #         ver_new=${ver_maj}.$((${ver_min}+1))
+      #       fi
+      #         sudo sed -i -e "/^pkgver=/c\pkgver=${ver_new}" PKGBUILD
+      #         sudo sed -i -e "/^pkgrel=/c\pkgrel=1" PKGBUILD
+      #         echo "update PKGBUILD"
+      #         updpkgsums
+      #         sudo git add PKGBUILD
+      #         sudo git commit -m"[pkg-upd] ${ver_new}-1"
+      #         sudo git push
+      #         sudo rm -rf src
+      #         # cd ..
+      #     elif [[ "${{ env.bump-pkgrel }}" == "true" ]]; then
+      #       repover=$(sudo pacman -Syi ${KERNEL} | grep Version | rev | cut -d' ' -f1 | rev | cut -d- -f1)
+      #       . ${KERNEL}/PKGBUILD
+      #       if [[ "$pkgver" == "$repover" ]]; then
+      #         sudo chown -R ${UID}:${UID} ${KERNEL}
+      #         cd ${KERNEL}
+      #         reporel=$(sudo pacman -Syi ${KERNEL} | grep Version | cut -d'-' -f2)
+      #         rel_new=$((${reporel}+1))
+      #         sudo sed -i -e "/^pkgrel=/c\pkgrel=${rel_new}" PKGBUILD
+      #         sudo git add PKGBUILD
+      #         sudo git commit -m"[pkg-upd] pkgrel ${rel_new}"
+      #         sudo git push
+      #         cd ..
+      #       fi
+      #     fi
+      # - name: build_kernel
+      #   shell: bash
+      #   run: |
+      #     sudo cp -arpf ${{ env.KERNEL }}/pacman/* ./${{ env.KERNEL }}/
+      #     pwd; ls -al;
+      #     sudo chrootbuild -p ${{ env.KERNEL }} -b ${{ env.branch }} -r ${{ github.workspace }}
+      #     if [ -z "${{ env.gpg-key }}" ] || [ -z "${{ env.gpg-passphrase }}" ]; then
+      #       echo "## gpg credentials not provided. Skip signing."
+      #     else
+      #       cat <(echo -e "${{ env.gpg-key }}" | base64 --decode) | gpg --batch --import &>/dev/null
+      #       for p in $(find $PWD -maxdepth 1 -regex '.*\.pkg\.tar\.\(xz\|zst\)'); do
+      #         echo "## signing $p"
+      #         gpg --pinentry-mode loopback --passphrase "${{ env.gpg-passphrase }}" --detach-sign ${p}
+      #       done
+      #     fi
+      #     CHRSRC=/var/lib/chrootbuild/build/${{ env.KERNEL }}
+      #     echo "CHRSRC=${CHRSRC}" >> $GITHUB_ENV
+      #     . ${CHRSRC}/PKGBUILD
+      #     if [[ ! -z ${_rc} ]]; then
+      #         _confpath=${CHRSRC}/src/linux-${_basekernel}-${_rc}
+      #     else
+      #         _confpath=${CHRSRC}/src/linux-${_basekernel}
+      #     fi
+      #     if [[ "${{ env.bump-kernel }}" == "true" ]]; then
+      #         cd ${{ env.KERNEL }}
+      #         if [[ -e config.rt ]]; then
+      #             sudo rm config.rt
+      #             sudo cp "${_confpath}/.config" config.rt
+      #         else
+      #             sudo rm config
+      #             sudo cp "${_confpath}/.config" config
+      #         fi
+      #         if [[ -e config.rt ]]; then
+      #             sudo git add config.rt
+      #         else
+      #             sudo git add config
+      #         fi
+      #         updpkgsums
+      #         sudo git add PKGBUILD
+      #         sudo git commit -m"update config" || true
+      #         sudo git push
+      #         sudo rm -rf .git
+      #         cd ..
+      #     fi
+      # - name: publish_kernel
       #   shell: bash -O extglob {0}
       #   run: |
       #     _chrpkb=${{ env.CHRSRC }}/PKGBUILD
@@ -314,7 +342,7 @@ jobs:
       #       fi
       #     done
       #     popd
-      # - id: build_modules
+      # - name: build_modules
       #   shell: bash
       #   run: |
       #     sudo chrootbuild -K modules -i "${{ env.KERNEL }}-${{ env.TAG }}*.zst" -i "${{ env.KERNEL }}-headers*.zst" -b ${{ inputs.branch }}
@@ -327,7 +355,7 @@ jobs:
       #         gpg --pinentry-mode loopback --passphrase "${{ inputs.gpg-passphrase }}" --detach-sign ${p}
       #       done
       #     fi
-      # - id: publish_logs
+      # - name: publish_logs
       #   shell: bash -O extglob {0}
       #   run: |
       #     pushd /home/runner/.chrootbuild-logs
@@ -336,14 +364,14 @@ jobs:
       #     GITHUB_LINK=${{ env.GITHUB_LINK }}
       #     gh release upload ${{ env.TAG }} --repo ${GITHUB_REPOSITORY} --clobber ./linux-${{ env.TAG }}-logs.zip # ./*.tar
       #     popd
-      # - id: publish_modules
+      # - name: publish_modules
       #   shell: bash -O extglob {0}
       #   run: |
       #     sudo zip "linux-${{ env.TAG }}-extramodules.zip" ./*.zst ./*.sig
       #     echo ${{ github.token }} | gh auth login --with-token
       #     GITHUB_LINK=${{ env.GITHUB_LINK }}
       #     gh release upload ${{ env.TAG }} --repo ${GITHUB_REPOSITORY} --clobber ./linux-${{ env.TAG }}-extramodules.zip # ./*.tar
-      # - id: deploy_bxt
+      # - name: deploy_bxt
       #   shell: bash -O extglob {0}
       #   run: |
       #     if [[ -z "${{ inputs.bxt-api-key }}" ]]; then
@@ -363,7 +391,7 @@ jobs:
       #         echo "Failed to obtain a session ID."
       #         exit 1
       #       fi
-      #       echo "Session ID: $SESSION_ID"
+      #       echo "Session name: $SESSION_ID"
 
       #       # Function to push a package
       #       push_package() {

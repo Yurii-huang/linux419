@@ -31,14 +31,18 @@ makedepends=('bc'
     'tar'
     'xz')
 options=('!strip')
-source=("git+file://${PWD}")
-sha256sums=()
+# source=("linux-${_basever}.tar.xz::git+file://${PWD}")
+# sha256sums=()
 prepare() {
-  cd "linux-${_basever}"
+  echo "workspace: $PWD"; ls -al
 
-  cat "../config" > ./.config
+  # git clone https://github.com/forked-manjaro/linux419.git -b dev linux-${_basever}
 
-  cat "../config.aufs" >> ./.config
+  # cd "linux-${_basever}"
+
+  cat "./config" > ./.config
+
+  cat "./config.aufs" >> ./.config
 
   if [ "${_kernelname}" != "" ]; then
     sed -i "s|CONFIG_LOCALVERSION=.*|CONFIG_LOCALVERSION=\"${_kernelname}\"|g" ./.config
@@ -60,7 +64,7 @@ prepare() {
 }
 
 build() {
-  cd "linux-${_basever}"
+  #cd "linux-${_basever}"
 
   msg "build"
   make ${MAKEFLAGS} LOCALVERSION= bzImage modules
@@ -72,7 +76,7 @@ package_linux419() {
   optdepends=('wireless-regdb: to set the correct wireless channels of your country')
   provides=("linux=${pkgver}" VIRTUALBOX-GUEST-MODULES)
 
-  cd "linux-${_basekernel}"
+  #cd "linux-${_basekernel}"
 
   # get kernel version
   _kernver="$(make LOCALVERSION= kernelrelease)"
@@ -103,7 +107,7 @@ package_linux419-headers() {
   depends=('gawk' 'python' 'libelf' 'pahole')
   provides=("linux-headers=$pkgver")
 
-  cd "linux-${_basever}"
+  #cd "linux-${_basever}"
   local _builddir="${pkgdir}/usr/lib/modules/${_kernver}/build"
 
   # add real version for building modules and running depmod from hook
