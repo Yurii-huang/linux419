@@ -40,9 +40,9 @@ prepare() {
 
   # cd "linux-${_basever}"
 
-  cat "./config" > ./.config
+  cat "../config" > ./.config
 
-  cat "./config.aufs" >> ./.config
+  cat "../config.aufs" >> ./.config
 
   if [ "${_kernelname}" != "" ]; then
     sed -i "s|CONFIG_LOCALVERSION=.*|CONFIG_LOCALVERSION=\"${_kernelname}\"|g" ./.config
@@ -67,7 +67,7 @@ build() {
   #cd "linux-${_basever}"
 
   msg "build"
-  make ${MAKEFLAGS} LOCALVERSION= bzImage modules
+  make -j$(nproc) ${MAKEFLAGS} LOCALVERSION= bzImage modules
 }
 
 package_linux419() {
