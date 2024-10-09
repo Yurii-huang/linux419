@@ -68,7 +68,7 @@ jobs:
       - name: install_build-dependencies
         shell: bash
         run: |
-          echo "Y"| pacman -Sy git devtools sudo
+          echo "Y"| pacman -Sy git devtools 
       - name: clone_repos
         shell: bash
         run: |
@@ -76,18 +76,16 @@ jobs:
           GITHUB_BRANCH=$(echo ${{ github.ref }}| cut -d'/' -f3)
           echo "KERNEL=${KERNEL}" >>$GITHUB_ENV
           mkdir -p /github/home/calong
-          useradd calong -m -d /github/home/calong
-          usermod -a -G root calong
-          usermod -a -G sudo calong
+          useradd -m -G wheel -s /bin/bash calong
+          echo "%wheel   ALL=(ALL)   ALL" >> /etc/sudoers
           chown -R calong:calong /github/home/calong
           su calong
-          echo $HOME
           su - calong -c "git clone https://github.com/${{ github.repository }}.git -b ${GITHUB_BRANCH} -c /github/home/calong"
           su - calong -c "cp -arpf ${KERNEL}/pacman/* ${KERNEL}/"
       - name: build_kernel
         shell: bash
         run: |
-          su calong -c "makepkg ${{ env.KERNEL }}/PKGBUILD"
+          su calong -c "makepkg /github/home/calong/${{ env.KERNEL }}/PKGBUILD"
           
       #   run: |
       #     sudo apt-get update
