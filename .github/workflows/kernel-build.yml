@@ -63,7 +63,7 @@ on:
 jobs:
   build-kernel:
     runs-on: ubuntu-20.04
-    container: archlinux
+    container: carterjones/manjaro
     steps:
       - name: install_build-dependencies
         shell: bash
