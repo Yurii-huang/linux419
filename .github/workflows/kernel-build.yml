@@ -68,7 +68,7 @@ jobs:
       - name: install_build-dependencies
         shell: bash
         run: |
-          echo "Y"| pacman -Sy git devtools sudo
+          echo "Y"| pacman -Sy git pacman sudo
       - name: clone_repos
         shell: bash
         run: |
