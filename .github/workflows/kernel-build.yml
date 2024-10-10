@@ -69,7 +69,7 @@ jobs:
       - name: install_build-dependencies
         shell: bash
         run: |
-          echo "Y"| pacman -Sy base-devel git pacman sudo bc docbook-xsl pahole inetutils xmlto cpio make
+          echo "Y"| pacman -Sy base-devel git pacman sudo bc docbook-xsl pahole inetutils xmlto cpio make fakeroot
       - name: clone_repos
         shell: bash
         run: |
