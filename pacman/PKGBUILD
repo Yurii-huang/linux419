@@ -31,17 +31,9 @@ makedepends=('bc'
     'tar'
     'xz')
 options=('!strip')
-# source=("linux-${_basever}.tar.xz::git+file://${PWD}")
-# sha256sums=()
+
 prepare() {
-  echo "workspace: $PWD"; ls -al
-
-  # git clone https://github.com/forked-manjaro/linux419.git -b dev linux-${_basever}
-
-  # cd "linux-${_basever}"
-
   cat "../config" > ./.config
-
   cat "../config.aufs" >> ./.config
 
   if [ "${_kernelname}" != "" ]; then
@@ -64,10 +56,8 @@ prepare() {
 }
 
 build() {
-  #cd "linux-${_basever}"
-
   msg "build"
-  make -j$(nproc) ${MAKEFLAGS} LOCALVERSION= bzImage modules
+  make ${MAKEFLAGS} LOCALVERSION= bzImage modules
 }
 
 package_linux419() {
@@ -75,8 +65,6 @@ package_linux419() {
   depends=('coreutils' 'linux-firmware' 'kmod' 'initramfs')
   optdepends=('wireless-regdb: to set the correct wireless channels of your country')
   provides=("linux=${pkgver}" VIRTUALBOX-GUEST-MODULES)
-
-  #cd "linux-${_basekernel}"
 
   # get kernel version
   _kernver="$(make LOCALVERSION= kernelrelease)"
@@ -107,7 +95,6 @@ package_linux419-headers() {
   depends=('gawk' 'python' 'libelf' 'pahole')
   provides=("linux-headers=$pkgver")
 
-  #cd "linux-${_basever}"
   local _builddir="${pkgdir}/usr/lib/modules/${_kernver}/build"
 
   # add real version for building modules and running depmod from hook
