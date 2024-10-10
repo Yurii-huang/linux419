@@ -64,6 +64,7 @@ jobs:
   build-kernel:
     runs-on: ubuntu-20.04
     container: carterjones/manjaro
+    timeout-minutes: 720 # timeout 12h
     steps:
       - name: install_build-dependencies
         shell: bash
