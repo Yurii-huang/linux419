@@ -43,7 +43,7 @@ jobs:
           echo "KERNEL=${KERNEL}" >>$GITHUB_ENV
           sed -i "s/MAKEFLAGS=\"-j2\"/MAKEFLAGS=\"-j8\"/g" /etc/makepkg.conf
           cat /etc/makepkg.conf |grep "MAKEFLAGS="
-          echo PACKAGER=\"Yurii Huang <funningc0217@foxmail.com>\" >> /etc/makepkg.conf
+          echo "PACKAGER=\"Yurii Huang <funningc0217@foxmail.com>\"" >> /etc/makepkg.conf
           cat /etc/makepkg.conf |grep "PACKAGER="
           echo "whoami: $(whoami)"; echo "PWD: $PWD"; echo "HOME: $HOME"; ls -al /builder
           su - builder -c "git clone https://github.com/${{ github.repository }}.git -b ${GITHUB_BRANCH} src"
